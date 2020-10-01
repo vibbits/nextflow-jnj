@@ -16,3 +16,8 @@ reference/
 *.bam
 
 
+
+# Nextflow ignoring
+.nextflow*
+work/
+
