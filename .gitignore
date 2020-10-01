@@ -3,9 +3,9 @@
 
 # Don't upload reference data to github. Only the notebook with instructions 
 # and the shell script to download the data. 
-./ref/*
-!./ref/Download_data.ipynb
-!./ref/get_bundle.sh
+ref/*
+!ref/Download_data.ipynb
+!ref/get_bundle.sh
 # If I ever change the name
-./reference
+reference/
 
