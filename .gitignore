@@ -9,3 +9,10 @@ ref/*
 # If I ever change the name
 reference/
 
+# Don't include any files of the following type:
+*.fq
+*.fq.gz
+*.sam
+*.bam
+
+
