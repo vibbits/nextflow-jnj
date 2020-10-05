@@ -15,7 +15,7 @@ read_pairs_ch = Channel.fromFilePairs(params.reads)
                       
 
 process trimmomatic {
-    publishDir "$params.outdir/trimming", mode: 'copy'
+    publishDir "$params.outdir/trimmed-reads", mode: 'copy'
     
     input:
     tuple val(sample), file(reads) from read_pairs_ch
@@ -28,7 +28,7 @@ process trimmomatic {
     script:
     """
     mkdir -p $params.outdir/trimmed-reads/
-    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} -baseout ${sample} SLIDINGWINDOW:4:15    AVGQUAL:30 > ${sample}.trimmomatic.stats.log
+    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} -baseout ${sample} SLIDINGWINDOW:4:15 AVGQUAL:30
     
     mv ${sample}_1P ${sample}_1P.fq
     mv ${sample}_2P ${sample}_2P.fq
