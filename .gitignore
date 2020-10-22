@@ -6,6 +6,7 @@
 reference/
 !reference/Download_data.ipynb
 !reference/get_bundle.sh
+results/
 
 # Don't include any files of the following type:
 *.fq
