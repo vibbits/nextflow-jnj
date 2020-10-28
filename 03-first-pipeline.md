@@ -5,7 +5,8 @@ The following script can be found and run in `03-first-pipeline/fastqc_1.nf`:
 ```
 #!/usr/bin/env nextflow
 
-params.reads = "$baseDir/../data/*.fq.gz"
+
+params.reads = "$projectDir/data/*.fq.gz"
 
 /**
  * Quality control fastq
@@ -29,7 +30,7 @@ process fastqc_raw_reads {
 
 The first line of our script is always a shebang line, declaring the environment where the OS can find the software (i.e. Nextflow). Generally, the input files are first assigned into parameters which allows flexibility on running the nextflow pipeline. Input files are then assigned to channels and they serve as input for the process. 
 
-- `$baseDir`: the folder from where the pipeline is run. 
+- `$projectDir`: The directory where the main script is located (version >20, replaces `$baseDir`). 
 - Flexibility in the language (writing of spaces, enters with channels, etc.) 
 
 QUESTION: where are the output files (html- & zip-files)? 
