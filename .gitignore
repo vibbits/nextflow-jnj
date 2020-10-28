@@ -1,11 +1,15 @@
+# Ignore general things
+docs/
+presentations/
+
 # Ignore checkpoint intermediates
 .ipynb_checkpoints
 
 # Don't upload reference data to github. Only the notebook with instructions 
 # and the shell script to download the data. 
-reference/
-!reference/Download_data.ipynb
-!reference/get_bundle.sh
+data/*
+!data/downl-data.sh
+
 results/
 
 # Don't include any files of the following type:
@@ -13,8 +17,6 @@ results/
 *.fq.gz
 *.sam
 *.bam
-
-
 
 # Nextflow ignoring
 .nextflow*
