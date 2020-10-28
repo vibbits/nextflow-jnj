@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-nextflow.preview.dsl=2
+// This is needed for activating the new DLS2
+nextflow.enable.dsl=2
 
 params.reads = "$baseDir/data/*0.01_{1,2}.fq.gz"
 params.outdir = "$baseDir/results"

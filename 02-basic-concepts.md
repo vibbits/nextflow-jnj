@@ -41,12 +41,7 @@ Consistency, track changes and revisions consistently for code, config files and
 Some thoughts, it takes some time to get used to the syntax, logic and Groovy language. As flexible as it is, as complex it gets. It's probably not the first thing you should be concerned of if you're doing a one-time analysis. 
 
 More technical details:
-[comment]: <> (
-Fast prototyping => Custom DSL that enables tasks composition, simplifies most use cases + general purpose programming language for corner cases
-Easy parallelisation => declarative reactive programming model based on dataflow paradigm, implicit portable parallelism
-Decouple components => functional approach a task execution is idempotent, ie cannot modify the state of other tasks + isolate dependencies with containers
-Portable deployments => executor abstraction layer + deployment configuration from implementation logic
-)
+[comment]: <> (- Fast prototyping => Custom DSL that enables tasks composition, simplifies most use cases + general purpose programming language for corner cases Easy parallelisation => declarative reactive programming model based on dataflow paradigm, implicit portable parallelism Decouple components => functional approach a task execution is idempotent, ie cannot modify the state of other tasks + isolate dependencies with containers Portable deployments => executor abstraction layer + deployment configuration from implementation logic)
 
 ## Main abstractions
 - Channels: unidirectional async queues that allows the processes to communicate with each other. Channels connect processes/operators with each other
@@ -103,9 +98,7 @@ c1 .mix(c2,c3)
 'z'
 ```
 
-**3. Processes:** are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. A script can be written in any language (bash, Pytho, Perl, Ruby, etc.)
-
-Each process is executed independently and isolated from any other process. They communicate via asynchronous FIFO queues.   
+**3. Processes:** are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. 
 
 ```
 process < name > {
@@ -126,6 +119,96 @@ process < name > {
 
 }
 ```
+
+Each process is executed independently and isolated from any other process. They communicate via asynchronous FIFO queues, i.e. one process will wait for the output of another and then runs reactively when the channel has contents. 
+
+
+---
+### Exercise:
+Inspect the script `02-basic-consepts/firstscript.nf` and notice how the channels are being created, passed on to the process' inputs, processed by the script section and then given to the output. 
+
+Run the script, look at the output and find where the result is stored. 
+
+[Solution]: <> (see below)
+---
+
+Nextflow will generate an output that has a standard lay-out consisting of :
+- version
+- which script has ran with an identifier name
+- hash with process ID, progress and caching information
+- output printed to the screen as defined in the script (if present)
+```
+N E X T F L O W  ~  version 20.07.1
+Launching `02-basic-concepts/firstscript.nf` [elegant_curie] - revision: 9f886cc00a
+executor >  local (2)
+executor >  local (2)
+[5e/195314] process > valuesToFile (2) [100%] 2 of 2 ✔
+results file: /path/to/work/51/7023ee62af2cb4fdd9ef654265506a/result.txt
+results file: /path/to/work/5e/195314955591a705e5af3c3ed0bd5a/result.txt
+```
+
+---
+### Exercise:
+Run script `02-basic-consepts/fifo.nf` and inspect the order that the channels are being processed. 
+
+[Solution]: <> (Implicit parallelisation *.fastq in a channel (one channel) will spit it out over multiple processes simultaneously. No need of making a for –loop. )
+
+![asynchr-fifo](img/asynchronous-FIFO.PNG)
+
+---
+
+A script, as part of the process, can be written in any language (bash, Python, Perl, Ruby, etc.). This allows to add self-written scripts in the pipeline. 
+
+```
+#!/usr/bin/env nextflow
+ 
+process python {
+    
+    """
+    #!/usr/bin/python3
+
+    firstWord = 'hello'
+    secondWord = 'folks'
+    print(f'{firstWord} {secondWord}')
+    """
+}
+```
+
+Note: directives will be handled further on in the course, conditionals are not considered here.
+
+## Configuration files, executors and portability
+Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define which executor to use, the processes' environment variables, pipeline parameters etc. In the example below we start with defining the processes' allowed memory, cpu-usage and execution time. 
+
+```
+process {
+     memory='1G'
+     cpus='1'
+     time='6h'
+}
+```
+
+Imagine that you want to separate analysis parameters in a separate file, this is possible by creating a `params.config` file and include it in the `nextflow.config` file as such: 
+```
+includeConfig "/path/to/params.config"
+```
+
+While a *process* defines *what* command or script has to be executed, the *executor* determines *how* that script is actually run on the target system. In the Nextflow framework architecture, the executor is the component that determines the system where a pipeline process is run and it supervises its execution.
+
+If not otherwise specified, processes are executed on the local computer. The local executor is very useful for pipeline development and testing purposes, but for real world computational pipelines an HPC or cloud platform is often required.
+
+In other words you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file.
+
+![executors](img/executors-schedulers.PNG)
+
+
+As discussed before, Nextflow is especially useful thanks to its portability, i.e. the native support for containers and environment managers. There are several options for attaching containers to your pipeline. Either you define a dedicated container for each process individually, or you define one container for all processes together. 
+
+```
+process.container = 'biocontainer/example:latest'
+singularity.cacheDir = "/path/to/singularity"
+```
+
+
 
 ## References:
 1. https://github.com/pditommaso/awesome-pipeline/
