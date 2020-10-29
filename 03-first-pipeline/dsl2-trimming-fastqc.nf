@@ -78,6 +78,7 @@ process fastqc_trim {
 }
 
 // Running a workflow with the defined processes here.  
+// TO DO :  fix double fastqc by invoking fastqc once with collect and mix.
 workflow {
 	read_pairs_ch.view()
 	fastqc_raw(read_pairs_ch) 
