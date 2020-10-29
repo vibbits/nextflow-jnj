@@ -1,6 +1,10 @@
 #!/usr/bin/env nextflow
 
-params.reads = "$baseDir/../data/*{1,2}.fq.gz"
+params.reads = "$launchDir/data/*{1,2}.fq.gz"
+
+/**
+ * Quality control fastq
+ */
 
 read_pairs_ch = Channel.fromFilePairs(params.reads)
                       .view()
@@ -12,6 +16,6 @@ process fastqc_raw_reads {
 
     script:
     """
-    fastqc $reads
+    fastqc ${reads}
     """
 }

@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Download raw files
-# $ chmod +x downl-raw-data.sh
-# $ ./downl-raw-data.sh
-
+# $ chmod +x downl-data.sh
+# $ ./downl-data.sh
+# if there is an error "... /bin/bash^M: bad interpreter: No such file or directory"
+# https://stackoverflow.com/questions/14219092/bash-script-and-bin-bashm-bad-interpreter-no-such-file-or-directory
 
 # Reference: https://zenodo.org/record/1193466#.X5kngIhKiUk
 
@@ -28,10 +29,10 @@ rawdatalink=https://zenodo.org/record/1193466/files
 
 # Download each fasta read sequence file into the directory
 for file in $LIST; do
-    echo "Downloading $file"
-    wget -P ../data -np ${rawdatalink}/$file
-done
+	    echo "Downloading $file"
+	        wget -P ../data -np ${rawdatalink}/$file
+	done
 
-# If zipped
-# echo "Unzipping files"
-gunzip ../data/*.fa.gz
+	# If zipped
+	# echo "Unzipping files"
+	gunzip ../data/*.fa.gz

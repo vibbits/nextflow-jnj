@@ -1,18 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.reads = "$baseDir/data/*0.01_{1,2}.fq.gz"
-params.outdir = "$baseDir/results"
-params.threads = 2
-
-println """\
-         NEXTFLOW COURSE
-================================
-Reads            : $params.reads
-Output-folder    : $params.outdir
-"""
-
-read_pairs_ch = Channel.fromFilePairs(params.reads)
-                      
+                
 
 process trimmomatic {
     publishDir "$params.outdir/trimmed-reads", mode: 'copy'

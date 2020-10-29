@@ -1,27 +1,29 @@
 #!/usr/bin/env nextflow
 
-params.reads = "$projectDir/../data/*{1,2}.fq.gz"
-params.outdir = "$projectDir/../results"
+params.reads = "$launchDir/data/*{1,2}.fq.gz"
+
+/**
+ * Quality control fastq
+ */
+
 
 println """\
-         NEXTFLOW COURSE
+      LIST OF PARAMETERS
 ================================
-Reads            : $params.reads
-Output-folder    : $params.outdir
+Reads         : $params.reads
 """
 
-read_pairs_ch = Channel.fromFilePairs(params.reads)
-                      
+read_pairs_ch = Channel
+        .fromFilePairs(params.reads, checkIfExists:true) // Alternatively: .ifEmpty { 'No read pairs found' } 
+        .view()
 
 process fastqc_raw_reads {
-    publishDir "$params.outdir/quality-control/", mode: 'copy', overwrite: true
-    
+
     input:
     tuple val(sample), file(reads) from read_pairs_ch
 
     script:
     """
-    mkdir -p $params.outdir/quality-control/
-    fastqc --outdir $params.outdir/quality-control/ ${reads}
+    fastqc ${reads}
     """
 }

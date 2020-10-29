@@ -1,27 +1,41 @@
 #!/usr/bin/env nextflow
 
-params.reads = "$baseDir/data/*0.01_{1,2}.fq.gz"
-params.env = "$params.abspath/environment.yml"
 
-println "reads: $params.reads"
+
+
+params.reads = "$launchDir/data/*{1,2}.fq.gz"
+params.outdir = "$launchDir/results"
 
 /**
  * Quality control fastq
  */
 
+println """\
+       LIST OF PARAMETERS
+================================
+Reads            : $params.reads
+Output-folder    : $params.outdir/
+"""
 
-read_pairs_ch = Channel .fromFilePairs(params.reads)
 
+read_pairs_ch = Channel
+        .fromFilePairs(params.reads, checkIfExists:true)
+        .view()                     
 
 process fastqc_raw_reads {
-    conda "$params.env"
-
+    // Copies the output files into the published directory. Overwrite in case data has changed (other raw reads etc.)
+    publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
+    
     input:
-    set sample_id, file(reads) from read_pairs1_ch
-    tuple val(x), file('latin.txt') from values
+    tuple val(sample), file(reads) from read_pairs_ch
+
+    //output:
+    //file("fastqc_${sample}_logs")
+
     script:
     """
-    mkdir -p $params.outdir/quality-control
-    fastqc ${reads}
+    mkdir -p $params.outdir/quality-control-$sample/
+    fastqc --outdir $params.outdir/quality-control-$sample/ ${reads}
     """
 }
+

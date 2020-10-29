@@ -10,11 +10,14 @@ presentations/
 data/*
 !data/downl-data.sh
 
-results/
+results/*
 
 # Don't include any files of the following type:
 *.fq
 *.fq.gz
+*.gtf
+*.fa.gz
+*.fa
 *.sam
 *.bam
 
