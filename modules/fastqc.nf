@@ -1,14 +1,32 @@
 #!/usr/bin/env nextflow
+
+// This is needed for activating the new DLS2
 nextflow.enable.dsl=2
 
-process fastqc {
+params.outdir = "$launchDir/results"
 
+process fastqc {
+  publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
+    
   input:
-  tuple val(sample), file(reads) 
+  tuple val(sample), file(reads)
+
+  output:
+  path("*_fastqc.{zip,html}") 
 
   script:
   """
-  mkdir -p $params.outdir/quality-control-dsl2
-  fastqc --outdir $params.outdir/quality-control ${reads}
+  fastqc ${reads}
   """
+}
+
+workflow QC {
+    take: 
+    input
+    
+    main:
+		out =  fastqc(input)
+    
+    emit:
+    out
 }

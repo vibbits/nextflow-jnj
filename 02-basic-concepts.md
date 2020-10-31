@@ -147,6 +147,18 @@ results file: /path/to/work/51/7023ee62af2cb4fdd9ef654265506a/result.txt
 results file: /path/to/work/5e/195314955591a705e5af3c3ed0bd5a/result.txt
 ```
 
+The results are stored in the results file as given in the two last lines and by default in the `work/` directory. Each output is stored in subfolders with names defined by hashes. 
+
+Besides the output, also a bunch of hidden `.command.*` files are present:
+
+- .exitcode, contains 0 if everything is ok, another value if there was a problem.
+- .command.log, contains the log of the command execution. Often is identical to .command.out
+- .command.out, contains the standard output of the command execution
+- .command.err, contains the standard error of the command execution
+- .command.begin, contains what has to be executed before .command.sh
+- .command.sh, contains the block of code indicated in the process
+- .command.run, contains the code made by nextflow for the execution of .command.sh and contains environmental variables, eventual invocations of linux containers etc
+
 ---
 ### Exercise:
 Run script `02-basic-consepts/fifo.nf` and inspect the order that the channels are being processed. 
@@ -175,39 +187,6 @@ process python {
 ```
 
 Note: directives will be handled further on in the course, conditionals are not considered here.
-
-## Configuration files, executors and portability
-Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define which executor to use, the processes' environment variables, pipeline parameters etc. In the example below we start with defining the processes' allowed memory, cpu-usage and execution time. 
-
-```
-process {
-     memory='1G'
-     cpus='1'
-     time='6h'
-}
-```
-
-Imagine that you want to separate analysis parameters in a separate file, this is possible by creating a `params.config` file and include it in the `nextflow.config` file as such: 
-```
-includeConfig "/path/to/params.config"
-```
-
-While a *process* defines *what* command or script has to be executed, the *executor* determines *how* that script is actually run on the target system. In the Nextflow framework architecture, the executor is the component that determines the system where a pipeline process is run and it supervises its execution.
-
-If not otherwise specified, processes are executed on the local computer. The local executor is very useful for pipeline development and testing purposes, but for real world computational pipelines an HPC or cloud platform is often required.
-
-In other words you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file.
-
-![executors](img/executors-schedulers.PNG)
-
-
-As discussed before, Nextflow is especially useful thanks to its portability, i.e. the native support for containers and environment managers. There are several options for attaching containers to your pipeline. Either you define a dedicated container for each process individually, or you define one container for all processes together. 
-
-```
-process.container = 'biocontainer/example:latest'
-singularity.cacheDir = "/path/to/singularity"
-```
-
 
 
 ## References:

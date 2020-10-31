@@ -25,7 +25,7 @@ read_pairs_ch = Channel
 
 // Definition of a process, notice the absence of the 'from channel'.
 // A process being defined, does not mean it's invoked (see workflow)
-process fastqc_raw {
+process fastqc {
   publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
     
   input:
@@ -46,27 +46,21 @@ process trimmomatic {
     input:
     tuple val(sample), file(reads) 
 
-
     output:
     tuple val(sample), file("${sample}_1P.fq"), file("${sample}_2P.fq"), emit: paired_fq
     tuple val(sample), file("${sample}_1U.fq"), file("${sample}_2U.fq"), emit: unpaired_fq
-    file "${sample}.trimmomatic.stats.log", emit: trimmomatic_stats
 
     script:
     """
     mkdir -p $params.outdir/trimmed-reads/
-    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} -baseout ${sample} $params.slidingwindow $params.avgqual 
-    
-    mv ${sample}_1P ${sample}_1P.fq
-    mv ${sample}_2P ${sample}_2P.fq
-    mv ${sample}_1U ${sample}_1U.fq
-    mv ${sample}_2U ${sample}_2U.fq
+    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} ${sample}_1P.fq ${sample}_1U.fq ${sample}_2P.fq ${sample}_2U.fq $params.slidingwindow $params.avgqual 
     """
 }
 
 // Running a workflow with the defined processes here.  
 workflow {
 	read_pairs_ch.view()
-	fastqc_raw(read_pairs_ch) 
-  trimmomatic(read_pairs_ch)
+	fastqc(read_pairs_ch) 
+  paired_fq = trimmomatic(read_pairs_ch)
+  //fastqc(paired_fq) // This will raise an error. 
 }

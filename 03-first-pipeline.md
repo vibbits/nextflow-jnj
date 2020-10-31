@@ -58,7 +58,7 @@ Exercise:
 **Warning**: Files are copied into the specified directory in an asynchronous manner, thus they may not be immediately available in the published directory at the end of the process execution. For this reason files published by a process must not be accessed by other downstream processes.
 
 ## Moving towards DSL2
-Nextflow recently went through a big make-over. The premise of the next version, using DSL2, is to make the pipelines more modular and simplify the writing of complex data analysis pipelines. As an example, have a look at [this complex pipelines](https://github.com/nf-core/rnaseq/blob/master/main.nf) as part of the [nf-core](https://nf-co.re/pipelines) pipelines. 
+Nextflow recently went through a big make-over. The premise of the next version, using DSL2, is to make the pipelines more modular and simplify the writing of complex data analysis pipelines. 
 
 The nf-script wil start with the following line:
 ```
@@ -73,7 +73,7 @@ Regarding the processes, the new DSL separates the definition of a process from 
 
 Let's have a look (`nextflow run 03-first-pipeline/dsl2-fastqc.nf`):
 
-```
+```nextflow
 #!/usr/bin/env nextflow
 
 // This is needed for activating the new DLS2
@@ -114,8 +114,71 @@ workflow {
 	read_pairs_ch.view()
 	fastqc(read_pairs_ch) 
 }
-
 ```
 
+Now we will add the next step in our pipeline, which is **trimming and filtering the low quality reads**. For this process, we will use the tool `trimmomatic`. The solution is available in `03-first-pipeline/dsl2-trimming.nf`. Here we're introducing a new option: `emit`. Defining a process output with `emit` allows us to use it as a channe lin the external scope.  
+
+
+At this point we're interested in the result of the `trimmomatic` process. Hence, we want to verify the quality of the reads with another `fastqc` process. Rerun `fastqc` on the filtered read sequences by adding it in the workflow of `03-first-pipeline/dsl2-trimming.nf`. Use the parameter `-resume`. 
+  
+- Hmm, error? `Process fastqc has been already used -- If you need to reuse the same component include it with a different name or include in a different workflow context`. It means that processes can only be used once in a workflow. This means that we need to come up with a smarter solution. 
+
+## Subworkflows and modules
+The workflow keyword allows the definition of **sub-workflow** components that enclose the invocation of one or more processes and operators. It also allows you to use this workflow from within another workflow. The workflow that does not cary any name is considered to be the main workflow and will be executed implicitly. 
+
+However, if we want to be truly modular, we can write a library of modules. A module can contain the definition of a function, process and workflow definitions. Navigate to the modules folder and find a script called `fastqc.nf`. This script consists of a process and a workflow. This module can be imported into our pipeline script (main workflow) like this:
+```
+include {QC} from './modules/fastqc.nf'
+```
+This line is quite specific. The workflow is defined within the curly brackets, the origin of the module defined by a relative path must start with `./`. 
+
+When including a module component it’s possible to specify a name alias. This allows the inclusion and the invocation of the same component multiple times in your script using different names. For example:
+``` 
+include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" //addParams(OUTPUT: fastqcOutputFolder)
+```
+Now we're ready to use a process, defined in a module, multiple times in a workflow. 
+
+- Hmm, error? `Workflow 'QC' declares 1 input channels but 2 were specified`. Notice that it won't work because twice same process, so do collect/mix. 
+
+
+## Configuration files, executors and portability
+Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define which executor to use, the processes' environment variables, pipeline parameters etc. In the example below we start with defining the processes' allowed memory, cpu-usage and execution time. 
+
+```
+process {
+     memory='1G'
+     cpus='1'
+     time='6h'
+}
+```
+
+Imagine that you want to separate analysis parameters in a separate file, this is possible by creating a `params.config` file and include it in the `nextflow.config` file as such: 
+```
+includeConfig "/path/to/params.config"
+```
+
+While a *process* defines *what* command or script has to be executed, the *executor* determines *how* that script is actually run on the target system. In the Nextflow framework architecture, the executor is the component that determines the system where a pipeline process is run and it supervises its execution.
+
+If not otherwise specified, processes are executed on the local computer. The local executor is very useful for pipeline development and testing purposes, but for real world computational pipelines an HPC or cloud platform is often required.
+
+In other words you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file.
+
+![executors](img/executors-schedulers.PNG)
+
+
+As discussed before, Nextflow is especially useful thanks to its portability, i.e. the native support for containers and environment managers. There are several options for attaching containers to your pipeline. Either you define a dedicated container for each process individually, or you define one container for all processes together. 
+
+```
+process.container = 'biocontainer/example:latest'
+singularity.cacheDir = "/path/to/singularity"
+```
 
 https://www.nextflow.io/docs/latest/docker.html
+
+
+## Modules
+Put mapping into modules. 
+
+## Publishing final results
+- DAG
+- Report

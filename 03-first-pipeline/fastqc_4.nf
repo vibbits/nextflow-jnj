@@ -1,8 +1,5 @@
 #!/usr/bin/env nextflow
 
-
-
-
 params.reads = "$launchDir/data/*{1,2}.fq.gz"
 params.outdir = "$launchDir/results"
 

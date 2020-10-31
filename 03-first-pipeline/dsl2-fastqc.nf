@@ -16,8 +16,8 @@ Output-folder    : $params.outdir/
 
 // Also channels are being created. 
 read_pairs_ch = Channel
-        .fromFilePairs(params.reads, checkIfExists:true)
-
+      .fromFilePairs(params.reads, checkIfExists:true)
+      
 // Definition of a process, notice the absence of the 'from channel'.
 // A process being defined, does not mean it's invoked (see workflow)
 process fastqc {

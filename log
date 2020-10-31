@@ -1,0 +1,15 @@
+N E X T F L O W  ~  version 20.07.1
+Launching `03-first-pipeline/dsl2-mapping.nf` [spontaneous_mclean] - revision: 5120907755
+      LIST OF PARAMETERS
+================================
+Reads            : /mnt/c/Users/tuurm/Documents/nextflow-course/data/*{1,2}.fq.gz
+Output-folder    : /mnt/c/Users/tuurm/Documents/nextflow-course/results/
+Threads          : 2
+...
+
+Cannot find a component with name 'IDX' in module: /mnt/c/Users/tuurm/Documents/nextflow-course/modules/fastqc.nf
+
+Did you mean one of these?
+
+
+ -- Check script '03-first-pipeline/dsl2-mapping.nf' at line: 55 or see '.nextflow.log' file for more details
