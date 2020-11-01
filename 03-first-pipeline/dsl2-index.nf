@@ -27,7 +27,6 @@ Threads          : $params.threads
 read_pairs_ch = Channel
         .fromFilePairs(params.reads, checkIfExists:true)
 
-dirgenome = file(params.dirgenome)
 genome = file(params.genome)
 gtf = file(params.gtf)
 
@@ -60,5 +59,5 @@ workflow {
 	fastqc_raw(read_pairs_ch) 
   paired_fq = trimmomatic(read_pairs_ch)
   fastqc_trim(paired_fq.mix())
-  IDX(dirgenome, genome, gtf)
+  IDX(genome, gtf)
 }

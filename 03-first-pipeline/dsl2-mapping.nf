@@ -4,7 +4,7 @@
 nextflow.enable.dsl=2
 
 // Similar to DSL1, the input data is defined in the beginning.
-params.reads = "$launchDir/data/*{1,2}.fq.gz"
+params.reads = "$launchDir/data/*{1,2}.fq"
 params.outdir = "$launchDir/results"
 params.threads = 2
 params.slidingwindow = "SLIDINGWINDOW:4:15"
@@ -27,10 +27,9 @@ Threads          : $params.threads
 read_pairs_ch = Channel
         .fromFilePairs(params.reads, checkIfExists:true)
 
-dirgenome = file(params.dirgenome)
+//dirgenome = file(params.dirgenome)
 genome = file(params.genome)
 gtf = file(params.gtf)
-
 
 // Process trimmomatic
 process trimmomatic {
@@ -41,8 +40,7 @@ process trimmomatic {
     tuple val(sample), file(reads) 
 
     output:
-    tuple val(sample), file("${sample}_1P.fq"), file("${sample}_2P.fq"), emit: paired_fq
-    tuple val(sample), file("${sample}_1U.fq"), file("${sample}_2U.fq"), emit: unpaired_fq
+    tuple val(sample), file("*P.fq"), emit: paired_fq
 
     script:
     """
@@ -58,8 +56,8 @@ include { IDX; MAP } from "${launchDir}/modules/star"
 workflow {
 	read_pairs_ch.view()
 	fastqc_raw(read_pairs_ch) 
-  paired_fq = trimmomatic(read_pairs_ch)
-  fastqc_trim(paired_fq.mix())
-  IDX(dirgenome, genome, gtf)
-  MAP(paired_fq, genome_index, gtf)
+  //paired_fq = trimmomatic(read_pairs_ch)
+  //fastqc_trim(paired_fq)
+  IDX(genome, gtf)
+  MAP(read_pairs_ch, gtf)
 }
