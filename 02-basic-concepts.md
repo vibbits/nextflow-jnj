@@ -14,18 +14,18 @@ blastp -query sample.fasta -outfmt 6 \
 ```
 Starting with a shebang line, the `blastp` command is piped through multiple times to eventually result in an output file `sequences.txt`. The downside of this very basic and intuitive pipeline is that it has a sequential flow. In response to that, pipeline tools were built which are aimed to deal with more complex situations. Nextflow is designed around the idea that Linux has many simple but powerful command-line and scripting tools that, when chained together, facilitate complex data manipulations. 
 
-Nextflow is not the only player in the field[[1](https://github.com/pditommaso/awesome-pipeline/)], however there are good reasons to opt for it. 
 
-By definition, Nextflow is a reactive workflow framework and a programming Domain Specific Language that eases the writing of data-intensive computational pipelines[[2](https://www.nextflow.io/)]. Nextflow scripting is an extension of the Groovy programming language, which in turn is a super-set of the Java programming language. Groovy can be considered as Python for Java in a way that simplifies the writing of code and is more approachable. 
+By definition, Nextflow is a reactive workflow framework and a programming Domain Specific Language that eases the writing of data-intensive computational pipelines[[1](https://www.nextflow.io/)]. Nextflow scripting is an extension of the Groovy programming language, which in turn is a super-set of the Java programming language. Groovy can be considered as Python for Java in a way that simplifies the writing of code and is more approachable. 
 
 ![language subset](img/java-groovy-nextflow.png)
 
 ## Why (not)?
+Nextflow is not the only player in the field[[2](https://github.com/pditommaso/awesome-pipeline/)], however there are good reasons to opt for it. 
 
-+ Parallelization 
-+ Scalability 
-+ Portability
-+ Reproducible (native support of containers, conda environments)
++ Parallelization: processes are automatically scheduled based on available resources 
++ Scalability: simple scaling from local to HPC-cluster usage
++ Portability: run across different platforms
++ Reproducible: native support for containers, conda environments, and interaction with Git.
 + Continuous checkpoints for resuming / expanding pipelines (which is usually the case for workflow pipelines)
 + Community[[3](https://nf-co.re/)]
 
@@ -38,10 +38,11 @@ Consistency, track changes and revisions consistently for code, config files and
 )
 
 
-Some thoughts, it takes some time to get used to the syntax, logic and Groovy language. As flexible as it is, as complex it gets. It's probably not the first thing you should be concerned of if you're doing a one-time analysis. 
+Some thoughts or disadvantages from my personal point of view, it takes some time to get used to the syntax of the Groovy language. As flexible as it is, as complex it gets. Often it's difficult to trace down the exact problem of a failure of a pipeline script. It's probably not the first thing you should be concerned of if you're doing a one-time analysis. 
 
 More technical details:
-[comment]: <> (- Fast prototyping => Custom DSL that enables tasks composition, simplifies most use cases + general purpose programming language for corner cases Easy parallelisation => declarative reactive programming model based on dataflow paradigm, implicit portable parallelism Decouple components => functional approach a task execution is idempotent, ie cannot modify the state of other tasks + isolate dependencies with containers Portable deployments => executor abstraction layer + deployment configuration from implementation logic)
+
+[comment]: # (- Fast prototyping => Custom DSL that enables tasks composition, simplifies most use cases + general purpose programming language for corner cases Easy parallelisation => declarative reactive programming model based on dataflow paradigm, implicit portable parallelism Decouple components => functional approach a task execution is idempotent, ie cannot modify the state of other tasks + isolate dependencies with containers Portable deployments => executor abstraction layer + deployment configuration from implementation logic)
 
 ## Main abstractions
 - Channels: unidirectional async queues that allows the processes to communicate with each other. Channels connect processes/operators with each other
@@ -190,8 +191,8 @@ Note: directives will be handled further on in the course, conditionals are not 
 
 
 ## References:
-1. https://github.com/pditommaso/awesome-pipeline/
-2. https://www.nextflow.io/
+1. https://www.nextflow.io/
+2. https://github.com/pditommaso/awesome-pipeline/
 3. https://nf-co.re/
 4. https://www.nextflow.io/docs/latest/channel.html#
 5. https://www.nextflow.io/docs/latest/operator.html?highlight=view#
