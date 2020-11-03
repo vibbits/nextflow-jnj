@@ -1,5 +1,5 @@
 # Basic concepts
-In this chapter we will elaborate on how Nextflow is designed, its syntax, etc. 
+In the first chapter we will elaborate on how Nextflow is designed, its advantages and disadvantages, the basic components, etc. 
 
 ## Introduction
 Writing workflows to automate processes is not something new. In the `data/` folder we've written a bash script that downloads the data that we will use throughout this tutorial. These bash scripts are probably one of the oldest forms of workflows. Let's have a look at another example:
@@ -18,7 +18,7 @@ Nextflow is not the only player in the field[[1](https://github.com/pditommaso/a
 
 By definition, Nextflow is a reactive workflow framework and a programming Domain Specific Language that eases the writing of data-intensive computational pipelines[[2](https://www.nextflow.io/)]. Nextflow scripting is an extension of the Groovy programming language, which in turn is a super-set of the Java programming language. Groovy can be considered as Python for Java in a way that simplifies the writing of code and is more approachable. 
 
-![language subset](img/java-groovy-nextflow.PNG)
+![language subset](img/java-groovy-nextflow.png)
 
 ## Why (not)?
 
