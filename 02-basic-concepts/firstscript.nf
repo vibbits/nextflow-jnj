@@ -8,9 +8,11 @@
  * comment
  */
 
+// Creating a channel
 numbers_ch = Channel.from(1,2,3)
 strings_ch = Channel.from('a','b')
 
+// Defining the process that is executed
 process valuesToFile {
 
     input: 
@@ -25,4 +27,5 @@ process valuesToFile {
     """
 }
 
+// Using the operator view to inspect the result
 result_ch.view{ "results file: $it"  }

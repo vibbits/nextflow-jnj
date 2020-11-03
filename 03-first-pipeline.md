@@ -1,7 +1,7 @@
 # Creating our first pipeline
-In this chapter we will build a basic RNA-seq pipeline consisting of quality controls, trimming of reads and mapping to a reference genome (and counting). We will build the pipeline step by step, starting from quality control with FastQC. We will very shortly introduce DSL1 in the beginning. After exploring Nextflow's flexibility on the quality control process, we will extend our pipeline script with the other processes while switching to the newer DSL2. 
+In this chapter we will build a basic RNA-seq pipeline consisting of quality controls, trimming of reads and mapping to a reference genome (excl. counting). We will build the pipeline step by step, starting from quality control with FastQC. We will start with DSL1 for this process. After exploring Nextflow's flexibility on the quality control process, we will switch to the newer DSL2 language and extend our pipeline script with the other processes. 
 
-## Quality control in DSL1
+## Quality control with DSL1
 
 The following script can be found and run in `03-first-pipeline/fastqc_1.nf`:
 ```
@@ -29,47 +29,36 @@ process fastqc_raw_reads {
 }
 ```
 
-The first line of our script is always a shebang line, declaring the environment where the OS can find the software (i.e. Nextflow). Generally, the input files are first assigned into parameters which allows flexibility flexibility in the pipeline. Input files are then assigned to channels and they serve as input for the process. 
+The first line of our script is always a shebang line, declaring the environment where the OS can find the software (i.e. Nextflow). Generally, the input files are first assigned into parameters which allows flexibility in the pipeline. Input files are then assigned to channels and they serve as input for the process. 
 
 Note:  
-- `$launchDir`: The directory where the main script is located (version >20, replaces `$baseDir`). 
+- `$launchDir`: The directory where the main script is located (replaces `$baseDir` in version >20). 
 - Flexibility in the language (writing of spaces, enters with channels, asigning channel values to a variable or using `.set{}`, etc.) 
 
----
-QUESTION:  
-Run script with the following line: `nextflow run 03-first-pipeline/fastqc_1.nf -bg > log`.  
-What does the `-bg > log` mean?  
-FastQC generates an html- and zip-file for each read. Where are the output files?  
-
-ANSWER: the hash at the beginning of each process reveals where you can find the result of each process. 
-
----
 
 
---- 
-Exercise: 
-- Adapt file for handling read pairs. Result: [`fastqc_2.nf`]
-- Print parameters using `println` & check if the files exist when creating the channels [`checkIfExists`](https://www.nextflow.io/docs/latest/channel.html?highlight=fromfilepairs). Invoke the checkIfExists-error by running the nextflow script with wrong reads:
-`nextflow run 03-first-pipeline/fastqc_3.nf --reads wrongfilename`. 
+In the following steps we will add new features to this script:
+1. Run script with the following line: `nextflow run 03-first-pipeline/fastqc_1.nf -bg > log`. What does the `-bg > log` mean? What would the advantage be? Additionally, FastQC generates an html- and zip-file for each read. Where are the output files?    
+[comment]: # (ANSWER: run in the background and push output of nextflow to the log file. No need of explicitly using nohup, screen or tmux.)  
+[comment]: # (ANSWER: the hash at the beginning of each process reveals where you can find the result of each process.)  
 
+2. Adapt file for handling read pairs. Result: [`fastqc_2.nf`]
 
-- Create a directory where the files can be stored (hint: [`publishDir`](https://www.nextflow.io/docs/latest/process.html?highlight=publishdir#publishdir))
+3. Print parameters using `println` & check if the files exist when creating the channels. Hint: [`checkIfExists`](https://www.nextflow.io/docs/latest/channel.html?highlight=fromfilepairs). Result: [`fastqc_3.nf`] Additionally, Invoke the checkIfExists-error by running the nextflow script with wrong reads: `nextflow run 03-first-pipeline/fastqc_3.nf --reads wrongfilename`. 
+
+4. Create a directory where the files can be stored. Hint: [`publishDir`](https://www.nextflow.io/docs/latest/process.html?highlight=publishdir#publishdir). Result: [`fastqc_4.nf`]
 
 **Warning**: Files are copied into the specified directory in an asynchronous manner, thus they may not be immediately available in the published directory at the end of the process execution. For this reason files published by a process must not be accessed by other downstream processes.
 
 ## Moving towards DSL2
 Nextflow recently went through a big make-over. The premise of the next version, using DSL2, is to make the pipelines more modular and simplify the writing of complex data analysis pipelines. 
 
-The nf-script wil start with the following line:
-```
-nextflow.enable.dsl=2
-```
-
-When using DSL1 each channel could only be consumed once, this is ommited in DSL2. Once created, a channel can be consumed indefinitely. 
-
-A new term is introduced now: `workflow`. In the workflow, the processes are called as functions with input arguments being the channels. 
-
-Regarding the processes, the new DSL separates the definition of a process from its invocation. This means that in DSL1 the process was defined and also run when it the script was invoked, however in DSL2, the definition of a process does not necessarily mean that it will be run. Moreover, within processes there are no more references to channels (i.e. `from` and `into`). The channels are passed as inputs to the processes which are defined and invoked in the `workflow`. 
+Here is a list of the major changes: 
+- Following the shebang line, the nf-script wil start with the following line: `nextflow.enable.dsl=2` (not to be mistaken with *preview*).
+- When using DSL1 each channel could only be consumed once, this is ommited in DSL2. Once created, a channel can be consumed indefinitely. 
+- A new term is introduced: `workflow`. In the workflow, the processes are called as functions with input arguments being the channels. 
+- Regarding the processes, the new DSL separates the definition of a process from its invocation. This means that in DSL1 the process was defined and also run when the script was invoked, however in DSL2, the definition of a process does not necessarily mean that it will be run. 
+- Moreover, within processes there are no more references to channels (i.e. `from` and `into`). The channels are passed as inputs to the processes which are defined and invoked in the `workflow`. 
 
 Let's have a look (`nextflow run 03-first-pipeline/dsl2-fastqc.nf`):
 
@@ -116,10 +105,12 @@ workflow {
 }
 ```
 
-Now we will add the next step in our pipeline, which is **trimming and filtering the low quality reads**. For this process, we will use the tool `trimmomatic`. The solution is available in `03-first-pipeline/dsl2-trimming.nf`. Here we're introducing a new option: `emit`. Defining a process output with `emit` allows us to use it as a channe lin the external scope.  
+Now we will add the next step in our pipeline, which is **trimming and filtering the low quality reads**. For this process, we will use the tool `trimmomatic`. 
+
+The solution is available in `03-first-pipeline/dsl2-trimming.nf`. Here we're introducing a new option: `emit`. Defining a process output with `emit` allows us to use it as a channel in the external scope.  
 
 
-At this point we're interested in the result of the `trimmomatic` process. Hence, we want to verify the quality of the reads with another `fastqc` process. Rerun `fastqc` on the filtered read sequences by adding it in the workflow of `03-first-pipeline/dsl2-trimming.nf`. Use the parameter `-resume`. 
+At this point we're interested in the result of the `trimmomatic` process. Hence, we want to verify the quality of the reads with another `fastqc` process. Re-run `fastqc` on the filtered read sequences by adding it in the workflow of `03-first-pipeline/dsl2-trimming.nf`. Use the parameter `-resume` to restart the pipeline from where it stopped the last time. 
   
 - Hmm, error? `Process fastqc has been already used -- If you need to reuse the same component include it with a different name or include in a different workflow context`. It means that processes can only be used once in a workflow. This means that we need to come up with a smarter solution (see below). 
 

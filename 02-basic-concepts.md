@@ -38,22 +38,24 @@ Consistency, track changes and revisions consistently for code, config files and
 )
 
 
-Some thoughts or disadvantages from my personal point of view, it takes some time to get used to the syntax of the Groovy language. As flexible as it is, as complex it gets. Often it's difficult to trace down the exact problem of a failure of a pipeline script. It's probably not the first thing you should be concerned of if you're doing a one-time analysis. 
+Some thoughts or disadvantages from my personal point of view, it takes some time to get used to the syntax of the Groovy language. As flexible as it is, as complex it gets. Often it's difficult to trace down the exact problem of a failure of a pipeline script, especially in the beginning. It's probably not the first thing you should be concerned of if you're doing a one-time analysis. 
 
-More technical details:
 
 [comment]: # (- Fast prototyping => Custom DSL that enables tasks composition, simplifies most use cases + general purpose programming language for corner cases Easy parallelisation => declarative reactive programming model based on dataflow paradigm, implicit portable parallelism Decouple components => functional approach a task execution is idempotent, ie cannot modify the state of other tasks + isolate dependencies with containers Portable deployments => executor abstraction layer + deployment configuration from implementation logic)
 
 ## Main abstractions
-- Channels: unidirectional async queues that allows the processes to communicate with each other. Channels connect processes/operators with each other
-- Operators: transform channels content by applying functions or transformations. 
-- Processes: run any piece of script
+Nextflow consists of three main components: channels, operators and processes. 
+- *Channels*: connect processes/operators with each other. On a more technical level, channels are unidirectional async queues that allows the processes to communicate with each other. 
+- *Operators*: transform the content of channels by applying functions or transformations. Usually operators are applied on channels to get the input of a process in the right format.  
+- *Processes*: define the piece of script that is actually being run (e.g. an alignment process with STAR)  
+The script `02-basic-concepts/firstscript.nf` is using these three components and gives an idea of how Nextflow scripts are being build. 
 
+Since the introduction of the new DSL2, *workflows* can be added to this list. This will be discussed in the next chapter. 
 
-![channels-processes](img/process-channel.PNG)
+![channels-processes](img/process-channel.png)
 
-**1. Channels:**  
-The input of the analysis is stored in a channel, these are generally files like sequencing, reference fasta, annotation files, etc. however the input could be of any kind like numbers, strings, lists, etc. To have a complete overview, we refer to the official documentation[[4](https://www.nextflow.io/docs/latest/channel.html#)] There are multiple ways of achieving this:
+### 1. Channels:  
+The input of the analysis is stored in a channel, these are generally files like sequencing, reference fasta, annotation files, etc. however the input can be of any kind like numbers, strings, lists, etc. To have a complete overview, we refer to the official documentation[[4](https://www.nextflow.io/docs/latest/channel.html#)]. Here are some examples of how a channel is being created:
 ```
 # Channel consisting of strings
 strings_ch = Channel.from('This', 'is', 'a', 'channel')
@@ -69,7 +71,7 @@ paired_ch = Channel.fromFilePairs('data/*{1,2}.fastq')
 ```
 These channels can then be used by operators or serve as an input for the processes.
 
-**2. Operators:**
+### 2. Operators:
 Operators are necessary to transfor the content of channels in a format that is necessary for usage in the processes. There is a plethora of different operators[[5](https://www.nextflow.io/docs/latest/operator.html?highlight=view#)], however only a handful are used extensively. Here are some examples that you might come accross:
 - `collect`: e.g. when using a channel consisting of multiple independent files (e.g. fastq-files) and need to be assembled for a next process. 
 ```
@@ -99,7 +101,8 @@ c1 .mix(c2,c3)
 'z'
 ```
 
-**3. Processes:** are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. 
+### 3. Processes:
+are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. 
 
 ```
 process < name > {
@@ -125,19 +128,16 @@ Each process is executed independently and isolated from any other process. They
 
 
 ---
-### Exercise:
-Inspect the script `02-basic-consepts/firstscript.nf` and notice how the channels are being created, passed on to the process' inputs, processed by the script section and then given to the output. 
+### Running our first script:
+If we want to run a Nextflow script in its most basic form, we will use the following command:
+```
+nextflow run example.nf
+```
+In our case, we will replace `example.nf` with `02-basic-consepts/firstscript.nf`. First, inspect the script `02-basic-consepts/firstscript.nf` and notice how the channels are being created, passed on to the process' inputs, processed by the script section and then given to the output. 
 
-Run the script, look at the output and find where the result is stored. 
+When we run this script, the result file will not be present in our folder structure. Question: look at the output... Can you guess where to find the result? 
 
-[Solution]: <> (see below)
----
-
-Nextflow will generate an output that has a standard lay-out consisting of :
-- version
-- which script has ran with an identifier name
-- hash with process ID, progress and caching information
-- output printed to the screen as defined in the script (if present)
+Nextflow will generate an output that has a standard lay-out:
 ```
 N E X T F L O W  ~  version 20.07.1
 Launching `02-basic-concepts/firstscript.nf` [elegant_curie] - revision: 9f886cc00a
@@ -147,8 +147,12 @@ executor >  local (2)
 results file: /path/to/work/51/7023ee62af2cb4fdd9ef654265506a/result.txt
 results file: /path/to/work/5e/195314955591a705e5af3c3ed0bd5a/result.txt
 ```
-
-The results are stored in the results file as given in the two last lines and by default in the `work/` directory. Each output is stored in subfolders with names defined by hashes. 
+The output consists of:
+- Version of nextflow 
+- Information regarding the script that has ran with an identifier name
+- Hash with process ID, progress and caching information
+- Optional output printed to the screen as defined in the script (if present)
+The results are stored in the results file as described in the two last lines. By default the results of a process are stored in the `work/` directory in subfolders with names defined by the hashes. 
 
 Besides the output, also a bunch of hidden `.command.*` files are present:
 
@@ -160,13 +164,11 @@ Besides the output, also a bunch of hidden `.command.*` files are present:
 - .command.sh, contains the block of code indicated in the process
 - .command.run, contains the code made by nextflow for the execution of .command.sh and contains environmental variables, eventual invocations of linux containers etc
 
----
-### Exercise:
-Run script `02-basic-consepts/fifo.nf` and inspect the order that the channels are being processed. 
+Earlier, we described that Nextflow uses an asynchronous FIFO principle. Let's exemplify this by running the script `02-basic-consepts/fifo.nf` and inspect the order that the channels are being processed. 
 
-[Solution]: <> (Implicit parallelisation *.fastq in a channel (one channel) will spit it out over multiple processes simultaneously. No need of making a for –loop. )
+Note also the implicit parallelisation *.fastq in a channel (one channel) will spit it out over multiple processes simultaneously. No need of making a fors–loop.
 
-![asynchr-fifo](img/asynchronous-FIFO.PNG)
+![asynchr-fifo](img/asynchronous-FIFO.png)
 
 ---
 
