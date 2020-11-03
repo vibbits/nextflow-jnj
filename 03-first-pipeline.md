@@ -112,7 +112,7 @@ The solution is available in `03-first-pipeline/dsl2-trimming.nf`. Here we're in
 
 At this point we're interested in the result of the `trimmomatic` process. Hence, we want to verify the quality of the reads with another `fastqc` process. Re-run `fastqc` on the filtered read sequences by adding it in the workflow of `03-first-pipeline/dsl2-trimming.nf`. Use the parameter `-resume` to restart the pipeline from where it stopped the last time. 
   
-- Hmm, error? `Process fastqc has been already used -- If you need to reuse the same component include it with a different name or include in a different workflow context`. It means that processes can only be used once in a workflow. This means that we need to come up with a smarter solution (see below). 
+Hmm, error? `Process fastqc has been already used -- If you need to reuse the same component include it with a different name or include in a different workflow context`. It means that processes can only be used once in a workflow. This means that we need to come up with a smarter solution (see below). 
 
 ## Subworkflows and modules
 The workflow keyword allows the definition of **sub-workflow** components that enclose the invocation of one or more processes and operators. It also allows you to use this workflow from within another workflow. The workflow that does not cary any name is considered to be the main workflow and will be executed implicitly. 
@@ -165,7 +165,6 @@ Run `03-first-pipeline/dsl2-subworkflow.nf` which contains the `trimmomatic` pro
 
 ## RNAseq pipeline
 Similarly as described above, we can extent this pipeline and map our trimmed reads on a reference genome. First, we'll have to index our reads and afterwards we can map our reads. In the folder `modules/` find the script `star.nf` which contains two processes: `star_index` and `star_alignment`. 
-
 These modules are called from the main script `03-first-pipeline/dsl2-RNAseq.nf`. 
 
 This pipeline is still subject to optimizations which will be elaborated in the next section. 

@@ -4,15 +4,37 @@
 nextflow.enable.dsl=2
 
 // Similar to DSL1, the input data is defined in the beginning.
+params.reads   = "$launchDir/data/*{1,2}.fq"
+params.outdir  = "$launchDir/results"
+params.threads = 2
+
+params.slidingwindow   = "SLIDINGWINDOW:4:15"
+params.avgqual         = "AVGQUAL:30"
+
+params.dirgenome   = "$launchDir/data"
+params.genome      = "$launchDir/data/Drosophila_melanogaster.BDGP6.dna.fa"
+params.gtf         = "$launchDir/data/Drosophila_melanogaster.BDGP6.85.sample.gtf"
+params.lengthreads = 98
 
 
 println """\
       LIST OF PARAMETERS
 ================================
+            GENERAL
 Reads            : $params.reads
-Output-folder    : $params.outdir/
+Results-folder   : $params.outdir/
 Threads          : $params.threads
-...
+================================
+          TRIMMOMATIC
+Sliding window   : $params.slidingwindow
+Average quality  : $params.avgqual
+================================
+             STAR
+Reference genome : $params.dirgenome
+Genome directory : $params.genome 
+GTF-file         : $params.gtf
+Length-reads     : $params.lengthreads
+================================
 """
 
 // Also channels are being created. 
@@ -41,7 +63,7 @@ process trimmomatic {
     """
 }
 
-include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" //addParams(OUTPUT: fastqcOutputFolder)
+include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" 
 include { IDX; MAP } from "${launchDir}/modules/star"
 
 // Running a workflow with the defined processes here.  
