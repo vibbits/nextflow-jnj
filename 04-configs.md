@@ -1,6 +1,6 @@
 # Managing configurations
 
-## Configuration files,  
+## Configuration files  
 Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define which executor to use, the processes' environment variables, pipeline parameters etc. In the example below we start with defining the processes' allowed memory- and cpu-usage. This list can be extended with parameters that are more relevant for HPC usage: time, queue, executor, etc. 
 
 ```
@@ -29,7 +29,7 @@ includeConfig "/path/to/params.config"
 ```
 ## Portability
 
-As discussed before, Nextflow is especially useful thanks to its portability, i.e. the native support for containers and environment managers. There are two options for attaching containers to your pipeline. Either you define a dedicated container image for each process individually, or you define one container for all processes together in the configurations file. 
+As discussed before, Nextflow is especially useful thanks to its portability and reproducibility, i.e. the native support for containers and environment managers. There are two options for attaching containers to your pipeline. Either you define a dedicated container image for each process individually, or you define one container for all processes together in the configurations file. 
 
 In the former case, simply define the container image name in the process directives. Here we defined a container that already exists in [DockerHub](https://hub.docker.com/r/biocontainers/fastqc):
 ```
@@ -44,9 +44,9 @@ process quality-control {
 
 In the latter case, write the following line in the `nextflow.config` file:
 ```
-process.container = 'biocontainer/rnaseq:latest'
+process.container = 'rnaseq:latest'
 ```
-In this case we're referring to an image that already exists locally on a computer. It was created by building it from the Dockerfile: `docker build -t rnaseq:latest .`. Notice however that all the tools and dependencies need to be present in this image. To run your pipeline script with this Docker container image, use the following: `nextflow run example.nf -with-docker`. 
+We're referring to a Docker container image that already exists locally on our computer, nl. `rnaseq:latest`. It was created by building it from the Dockerfile: `docker build -t rnaseq:latest .`. Notice however that all the tools and dependencies necessary during your pipeline, need to be present in this image. To run your pipeline script with this Docker container image, use the following command: `nextflow run example.nf -with-docker`. 
 
 Similarly with a singularity image:
 ```
@@ -58,7 +58,7 @@ While a *process* defines *what* command or script has to be executed, the *e
 
 If not otherwise specified, processes are executed on the local computer. The local executor is very useful for pipeline development and testing purposes, but for real world computational pipelines an HPC or cloud platform is often required.
 
-In other words you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file.
+Hence, you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file. As these configurations are often a one-time effort, managed by a local IT/admin person, we refer to the [official documentation](https://www.nextflow.io/docs/latest/executor.html). 
 
-![executors](img/executors-schedulers.PNG)
+![executors](img/executors-schedulers.png)
 

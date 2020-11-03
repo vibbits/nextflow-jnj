@@ -3,18 +3,6 @@
 // This is needed for activating the new DLS2
 nextflow.enable.dsl=2
 
-params.reads   = "$launchDir/data/*{1,2}.fq"
-params.outdir  = "$launchDir/results"
-params.threads = 2
-
-params.slidingwindow   = "SLIDINGWINDOW:4:15"
-params.avgqual         = "AVGQUAL:30"
-
-params.dirgenome   = "$launchDir/data"
-params.genome      = "$launchDir/data/Drosophila_melanogaster.BDGP6.dna.fa"
-params.gtf         = "$launchDir/data/Drosophila_melanogaster.BDGP6.85.sample.gtf"
-params.lengthreads = 98
-
 
 println """\
       LIST OF PARAMETERS
