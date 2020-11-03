@@ -10,9 +10,6 @@ process star_index {
     file genome
     file gtf
 
-    //output: 
-    //path "$params.dirgenome/idx", emit: dir_index
-
     script:
     """
     mkdir -p $params.dirgenome 
@@ -50,16 +47,18 @@ process star_alignment {
     script:
     """
     mkdir -p $params.outdir/mapped-reads/
-    STAR --runMode alignReads 
+    STAR --runMode alignReads \\
         --genomeDir $params.dirgenome \\  
         --runThreadN ${params.threads} \\
-        --outFileNamePrefix ${sample}
+        --outFileNamePrefix ${sample} \\
         --outSAMtype BAM SortedByCoordinate \\
-        --sjdbGTFfile $gtf \\
-        --sjdbOverhang $params.lengthreads
-        --readFilesIn ${reads[0]} ${reads[1]} 
+        --sjdbGTFfile data/${gtf} \\
+        --sjdbOverhang $params.lengthreads \\
+        --readFilesIn $params.outdir/trimmed-reads/${reads[0]} $params.outdir/trimmed-reads/${reads[1]} 
     """
 }
+//         --sjdbGTFfile ${gtf} \\
+
 
 // Running a workflow with the defined processes here.  
 workflow IDX {
