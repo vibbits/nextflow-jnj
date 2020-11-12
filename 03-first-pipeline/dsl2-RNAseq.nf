@@ -4,7 +4,7 @@
 nextflow.enable.dsl=2
 
 // Similar to DSL1, the input data is defined in the beginning.
-params.reads   = "$launchDir/data/*{1,2}.fq"
+params.reads   = "$launchDir/data/*{1,2}.fq.gz"
 params.outdir  = "$launchDir/results"
 params.threads = 2
 
@@ -54,12 +54,13 @@ process trimmomatic {
     tuple val(sample), file(reads) 
 
     output:
-    tuple val(sample), file("*P.fq"), emit: paired_fq
+    tuple val(sample), file("${sample}{1,2}_P.fq"), emit: paired_fq
+    //tuple val(sample), file("${sample}_1U.fq"), file("${sample}_2U.fq"), emit: unpaired_fq
 
     script:
     """
     mkdir -p $params.outdir/trimmed-reads/
-    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} ${sample}_1P.fq ${sample}_1U.fq ${sample}_2P.fq ${sample}_2U.fq $params.slidingwindow $params.avgqual 
+    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} ${sample}1_P.fq ${sample}1_U.fq ${sample}2_P.fq ${sample}2_U.fq $params.slidingwindow $params.avgqual 
     """
 }
 

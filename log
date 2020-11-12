@@ -1,0 +1,24 @@
+N E X T F L O W  ~  version 20.07.1
+Launching `04-configs/dsl2-RNAseq.nf` [stoic_wescoff] - revision: 66504066a8
+      LIST OF PARAMETERS
+================================
+            GENERAL
+Reads            : /mnt/c/Users/tuurm/Documents/nextflow-course/data/*{1,2}.fq.gz
+Results-folder   : /mnt/c/Users/tuurm/Documents/nextflow-course/results/
+Threads          : 2
+================================
+          TRIMMOMATIC
+Sliding window   : SLIDINGWINDOW:4:15
+Average quality  : AVGQUAL:30
+================================
+             STAR
+Reference genome : /mnt/c/Users/tuurm/Documents/nextflow-course/data
+Genome directory : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.dna.fa 
+GTF-file         : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.85.sample.gtf
+Length-reads     : 98
+================================
+
+[WT_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R1.fq.gz, /mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R2.fq.gz]]
+[18/a1ed6b] Submitted process > fastqc_raw:fastqc (1)
+[b4/346e24] Submitted process > trimmomatic (1)
+[42/493ae3] Submitted process > fastqc_trim:fastqc (1)

@@ -31,8 +31,8 @@ rawdatalink=https://zenodo.org/record/1193466/files
 for file in $LIST; do
 	    echo "Downloading $file"
 	        wget -P ../data -np ${rawdatalink}/$file
-	done
+done
 
-	# If zipped
-	# echo "Unzipping files"
-	gunzip ../data/*.fa.gz
+# If zipped
+# echo "Unzipping files"
+gunzip ../data/*.fa.gz
