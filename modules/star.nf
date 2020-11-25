@@ -27,7 +27,8 @@ process star_index {
 
 process star_alignment {
     publishDir "$params.outdir/mapped-reads", mode: 'copy', overwrite: true
-    
+    label 'low'
+
     input:
     tuple val(sample), file(reads) 
     file gtf

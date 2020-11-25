@@ -36,7 +36,8 @@ gtf = file(params.gtf)
 // Process trimmomatic
 process trimmomatic {
     publishDir "$params.outdir/trimmed-reads", mode: 'copy'
-
+    label 'low'
+    
     // Same input as fastqc on raw reads, comes from the same channel. 
     input:
     tuple val(sample), file(reads) 

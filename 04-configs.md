@@ -1,7 +1,9 @@
 # Managing configurations
 
 ## Configuration files  
-Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define which executor to use, the processes' environment variables, pipeline parameters etc. In the example below we start with defining the processes' allowed memory- and cpu-usage. This list can be extended with parameters that are more relevant for HPC usage: time, queue, executor, etc. 
+Pipeline configuration properties are defined in a file named `nextflow.config` in the pipeline execution directory. This file can be used to define technical and project depeding parameters, e.g. which executor to use, the processes' environment variables, pipeline parameters etc. Hence, the configuration file allows to separate these variables from the script and makes the scripts more flexible depending on the project you're using it for and the infrastructure you're running it on.  
+
+In the example below we start with defining the processes' allowed memory- and cpu-usage. This list can be extended with parameters that are more relevant for HPC usage: time, queue, executor, etc. 
 
 ```
 process {
@@ -31,10 +33,11 @@ includeConfig "/path/to/params.config"
 
 As discussed before, Nextflow is especially useful thanks to its portability and reproducibility, i.e. the native support for containers and environment managers. There are two options for attaching containers to your pipeline. Either you define a dedicated container image for each process individually, or you define one container for all processes together in the configurations file. 
 
-In the former case, simply define the container image name in the process directives. Here we defined a container that already exists in [DockerHub](https://hub.docker.com/r/biocontainers/fastqc):
+In the former case, simply define the container image name in the process directives. In the snippet below, we defined a container that already exists in [DockerHub](https://hub.docker.com/r/biocontainers/fastqc). Dockerhub is also the default location where Nextflow will search for the existence of this container if it doesn't exist locally. 
+
 ```
 process quality-control {
-    container 'biocontainers/fastqc:latest'
+    container 'biocontainers/fastqc:v0.11.9_cv7'
 
     """
     fastqc ...
@@ -46,9 +49,11 @@ In the latter case, write the following line in the `nextflow.config` file:
 ```
 process.container = 'rnaseq:latest'
 ```
-We're referring to a Docker container image that already exists locally on our computer, nl. `rnaseq:latest`. It was created by building it from the Dockerfile: `docker build -t rnaseq:latest .`. Notice however that all the tools and dependencies necessary during your pipeline, need to be present in this image. To run your pipeline script with this Docker container image, use the following command: `nextflow run example.nf -with-docker`. 
+We're referring to a Docker container image that already exists locally on our computer, nl. `rnaseq:latest`. It was created by building it from the Dockerfile: `docker build -t rnaseq:latest .`. Notice however that all the tools and dependencies necessary during your pipeline, need to be present in this image. To run the pipeline script with this Docker container image, use the following command: `nextflow run example.nf -with-docker`. 
 
-Similarly with a singularity image:
+Ultimately, the parameter `-with-docker` does not need to be defined and it should use the Docker container in the background at all times, for this purpose also use the `docker.enabled = true` option in the config file. Another interesting parameter to consider addin to the configuration file is the `docker.runOptions = '-u \$(id -u):\$(id -g)'`. This allows us to create files with permissions on user-level instead of the default root-level files.  
+
+Similarly with a singularity image. The first time running with Singularity container can be done with `-with-singularity` parameter where the image is downloaded from Dockerhub as well, built on runtime and then stored in a folder `singularity/`. Re-using a singularity image is possible with:
 ```
 singularity.cacheDir = "/path/to/singularity"
 ```

@@ -39,14 +39,19 @@ Note:
 
 In the following steps we will add new features to this script:
 1. Run script with the following line: `nextflow run 03-first-pipeline/fastqc_1.nf -bg > log`. What does the `-bg > log` mean? What would the advantage be? Additionally, FastQC generates an html- and zip-file for each read. Where are the output files?    
-[comment]: # (ANSWER: run in the background and push output of nextflow to the log file. No need of explicitly using nohup, screen or tmux.)  
+
+[comment]: # (ANSWER: run in the background and push output of nextflow to the log file. No need of explicitly using nohup, screen or tmux.)
+  
 [comment]: # (ANSWER: the hash at the beginning of each process reveals where you can find the result of each process.)  
 
 2. Adapt file for handling read pairs. Result: [`fastqc_2.nf`]
 
 3. Print parameters using `println` & check if the files exist when creating the channels. Hint: [`checkIfExists`](https://www.nextflow.io/docs/latest/channel.html?highlight=fromfilepairs). Result: [`fastqc_3.nf`] Additionally, Invoke the checkIfExists-error by running the nextflow script with wrong reads: `nextflow run 03-first-pipeline/fastqc_3.nf --reads wrongfilename`. 
 
-4. Create a directory where the files can be stored. Hint: [`publishDir`](https://www.nextflow.io/docs/latest/process.html?highlight=publishdir#publishdir). Result: [`fastqc_4.nf`]
+4. Create a directory where the files can be stored. Hint: [`publishDir`](https://www.nextflow.io/docs/latest/process.html?highlight=publishdir#publishdir). Without any additional arguments, a hyperlink will be created to the files stored in the `work/` directory, with mode set to copy (`mode: 'copy'`) the files will be made available in the defined directory. Can you guess what might happen if we set the mode to move? (`mode: 'move'`) Result: [`fastqc_4.nf`]. 
+
+[comment]: # (ANSWER: If the output is to be used by another process, and the files are being moved, they won't be accessible for the next process and hence you're pipeline will fail complaining about files not being present.) 
+
 
 **Warning**: Files are copied into the specified directory in an asynchronous manner, thus they may not be immediately available in the published directory at the end of the process execution. For this reason files published by a process must not be accessed by other downstream processes.
 

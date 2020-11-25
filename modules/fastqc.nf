@@ -7,7 +7,8 @@ params.outdir = "$launchDir/results"
 
 process fastqc {
   publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
-    
+  label 'low'
+  
   input:
   tuple val(sample), file(reads)
 
