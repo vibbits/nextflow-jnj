@@ -10,7 +10,7 @@ process fastqc {
   label 'low'
   
   input:
-  tuple val(sample), file(reads)
+  tuple val(sample), path(reads)
 
   output:
   path("*_fastqc.{zip,html}") 

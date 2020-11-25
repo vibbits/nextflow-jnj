@@ -12,10 +12,10 @@ process trimmomatic {
 
     // Same input as fastqc on raw reads, comes from the same channel. 
     input:
-    tuple val(sample), file(reads) 
+    tuple val(sample), path(reads) 
 
     output:
-    tuple val(sample), file("${sample}{1,2}_P.fq")
+    tuple val("${sample}"), path("${sample}{1,2}_P.fq")
 
     script:
     """

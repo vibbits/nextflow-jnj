@@ -3,62 +3,67 @@
 // This is needed for activating the new DLS2
 nextflow.enable.dsl=2
 
+params.outdir = "$launchDir/results"
+params.genomeDir = "$launchDir/data/index/"
+
 process star_index {
-    publishDir "$params.dirgenome", mode: 'copy', overwrite: true
-    
+    publishDir "$params.genomeDir", mode: 'copy', overwrite: true
+    label 'low'
+
     input:
-    file genome
-    file gtf
+    path genome_ch
+    path gtf_ch
+
+    output:
+    path "star", emit: index
 
     script:
     """
-    mkdir -p $params.dirgenome 
+    mkdir -p $params.genomeDir
 
-    STAR --runThreadN $params.threads \\
+    STAR --runThreadN $task.cpus \\
       --runMode genomeGenerate \\
-      --genomeDir $params.dirgenome \\
-      --genomeFastaFiles $genome \\
-      --sjdbGTFfile $gtf \\
-      --sjdbOverhang $params.lengthreads \\
-      --genomeSAindexNbases 10
+      --genomeDir $params.genomeDir \\
+      --genomeFastaFiles $genome_ch \\
+      --genomeSAindexNbases $params.genomeSAindexNbases \\
+      --sjdbGTFfile $gtf_ch 
     """
 }
 
 
 process star_alignment {
     publishDir "$params.outdir/mapped-reads", mode: 'copy', overwrite: true
-    label 'low'
+    label 'high'
 
     input:
-    tuple val(sample), file(reads) 
-    file gtf
+    tuple val(sample), path(reads) 
+    path (index)
+    path (gtf)
 
     output:
-    //file "${sample}.mappings.bam", emit: samples_bam
+    //tuple val(sample), path("*Aligned.out.bam") , emit: bam
+    //tuple val(meta), path("*Log.final.out")   , emit: log_final
+    //tuple val(meta), path("*Log.out")         , emit: log_out
+    //tuple val(meta), path("*Log.progress.out"), emit: log_progress
+    //path  "*.version.txt"                     , emit: version
 
-        //  output:
-        //  set file("*Log.final.out"), file ('*.bam') into star_aligned
-        //  file "*.out" into alignment_logs
-        //  file "*SJ.out.tab"
-        //  file "*Log.out" into star_log
-        //  file "where_are_my_files.txt"
-        //  file "*Unmapped*" optional true
-        //  file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
+    tuple val(sample), path("*sortedByCoord.out.bam")  , emit: bam_sorted
+    //tuple val(meta), path("*toTranscriptome.out.bam"), optional:true, emit: bam_transcript
+    //tuple val(meta), path("*fastq.gz")               , optional:true, emit: fastq
+    //tuple val(meta), path("*.tab")                   , optional:true, emit: tab
 
     script:
     """
     mkdir -p $params.outdir/mapped-reads/
     STAR --runMode alignReads \\
-        --genomeDir $params.dirgenome \\  
-        --runThreadN ${params.threads} \\
+        --genomeDir $index \\  
+        --runThreadN $task.cpus \\
         --outFileNamePrefix ${sample} \\
         --outSAMtype BAM SortedByCoordinate \\
-        --sjdbGTFfile data/${gtf} \\
-        --sjdbOverhang $params.lengthreads \\
-        --readFilesIn $params.outdir/trimmed-reads/${reads[0]} $params.outdir/trimmed-reads/${reads[1]} 
+        --sjdbGTFfile ${gtf} \\
+        --readFilesIn ${reads[0]} ${reads[1]} 
     """
 }
-//         --sjdbGTFfile ${gtf} \\
 
 
 // Running a workflow with the defined processes here.  
@@ -68,17 +73,21 @@ workflow IDX {
   gtf
 
   main: 
-  star_index(genome, gtf)
+  index = star_index(genome, gtf)
+
+  emit:
+  index
 }
 
 workflow MAP {
   take:
   reads
+  index
   gtf
 
   main: 
-  star_alignment(reads, gtf)
+  aligned_reads = star_alignment(reads,index, gtf)
 
-//  emit:
-//  samples_bam = star_alignment.out.samples_bam
+  emit:
+  aligned_reads //= star_alignment.out.samples_bam
 }

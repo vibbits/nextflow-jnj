@@ -1,5 +1,5 @@
 N E X T F L O W  ~  version 20.07.1
-Launching `04-configs/dsl2-RNAseq.nf` [stoic_wescoff] - revision: 66504066a8
+Launching `04-configs/dsl2-RNAseq.nf` [drunk_heyrovsky] - revision: 6abf3b4557
       LIST OF PARAMETERS
 ================================
             GENERAL
@@ -16,9 +16,45 @@ Reference genome : /mnt/c/Users/tuurm/Documents/nextflow-course/data
 Genome directory : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.dna.fa 
 GTF-file         : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.85.sample.gtf
 Length-reads     : 98
+SAindexNbases    : 10
 ================================
 
+[mut_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R1.fq.gz, /mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R2.fq.gz]]
 [WT_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R1.fq.gz, /mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R2.fq.gz]]
-[18/a1ed6b] Submitted process > fastqc_raw:fastqc (1)
-[b4/346e24] Submitted process > trimmomatic (1)
-[42/493ae3] Submitted process > fastqc_trim:fastqc (1)
+[0e/6ea98a] Cached process > TRIM:trimmomatic (1)
+[f8/1523a4] Cached process > fastqc_raw:fastqc (2)
+[2f/46b73e] Cached process > fastqc_raw:fastqc (1)
+[a8/6e8bdb] Cached process > TRIM:trimmomatic (2)
+[05/f5d4a8] Cached process > fastqc_trim:fastqc (1)
+[90/8995a7] Cached process > fastqc_trim:fastqc (2)
+[f4/a86df5] Submitted process > MAP:star_alignment (1)
+Error executing process > 'MAP:star_alignment (1)'
+
+Caused by:
+  Process `MAP:star_alignment (1)` terminated with an error exit status (139)
+
+Command executed:
+
+  mkdir -p /mnt/c/Users/tuurm/Documents/nextflow-course/results/mapped-reads/
+  STAR --runMode alignReads \
+      --genomeDir index \  
+      --runThreadN 4 \
+      --outFileNamePrefix mut_lib1_R \
+      --outSAMtype BAM SortedByCoordinate \
+      --sjdbGTFfile Drosophila_melanogaster.BDGP6.85.sample.gtf \
+      --readFilesIn mut_lib1_R1_P.fq mut_lib1_R2_P.fq
+
+Command exit status:
+  139
+
+Command output:
+  (empty)
+
+Command error:
+  .command.sh: line 4:     8 Segmentation fault      STAR --runMode alignReads --genomeDir index \ 
+
+Work dir:
+  /mnt/c/Users/tuurm/Documents/nextflow-course/work/f4/a86df550c4b5b0d369591704989c08
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+
