@@ -9,13 +9,14 @@ params.outdir = "$launchDir/results"
 process trimmomatic {
     publishDir "$params.outdir/trimmed-reads", mode: 'copy', overwrite: true
     label 'low'
+    container 'quay.io/biocontainers/trimmomatic:0.35--6'
 
     // Same input as fastqc on raw reads, comes from the same channel. 
     input:
     tuple val(sample), path(reads) 
 
     output:
-    tuple val("${sample}"), path("${sample}{1,2}_P.fq")
+    tuple val("${sample}"), path("${sample}{1,2}_P.fq"), emit: trim_fq
 
     script:
     """

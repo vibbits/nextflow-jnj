@@ -30,16 +30,11 @@ SAindexNbases    : $params.genomeSAindexNbases
 read_pairs_ch = Channel
         .fromFilePairs(params.reads, checkIfExists:true)
 
-//genome = Channel
-//        .fromPath(params.genome, checkIfExists:true)
-
-//gtf = Channel
-//        .fromPath(params.gtf, checkIfExists:true)
-//dirgenome = file(params.dirgenome)
 genome = file(params.genome)
 gtf = file(params.gtf)
 
-index = Channel.fromPath(params.indexpath, checkIfExists:true)
+index = Channel
+    .fromPath(params.indexpath, checkIfExists:true)
 
 include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" //addParams(OUTPUT: fastqcOutputFolder)
 include { IDX; MAP } from "${launchDir}/modules/star"
@@ -48,9 +43,13 @@ include { TRIM } from "${launchDir}/modules/trimmomatic"
 // Running a workflow with the defined processes here.  
 workflow {
 	read_pairs_ch.view()
+  index.view()
 	fastqc_raw(read_pairs_ch) 
-	trim_paired_fq = TRIM(read_pairs_ch)
-	fastqc_trim(trim_paired_fq)
+	//TRIM(read_pairs_ch)
+  //trim_paired_fq = TRIM(read_pairs_ch)
+	//fastqc_trim(trim_paired_fq)
 	//index = IDX(genome, gtf)
-	MAP(trim_paired_fq, index, gtf)
+  //trim_paired_fq.view()
+	IDX(genome, gtf)
+  //MAP(read_pairs_ch, index, gtf)
 }

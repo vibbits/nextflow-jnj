@@ -1,9 +1,9 @@
 N E X T F L O W  ~  version 20.07.1
-Launching `04-configs/dsl2-RNAseq.nf` [drunk_heyrovsky] - revision: 6abf3b4557
+Launching `04-configs/dsl2-RNAseq.nf` [fabulous_perlman] - revision: 0521aa1104
       LIST OF PARAMETERS
 ================================
             GENERAL
-Reads            : /mnt/c/Users/tuurm/Documents/nextflow-course/data/*{1,2}.fq.gz
+Reads            : /mnt/c/Users/tuurm/Documents/nextflow-course/data/*{1,2}.fq
 Results-folder   : /mnt/c/Users/tuurm/Documents/nextflow-course/results/
 Threads          : 2
 ================================
@@ -19,42 +19,43 @@ Length-reads     : 98
 SAindexNbases    : 10
 ================================
 
-[mut_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R1.fq.gz, /mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R2.fq.gz]]
-[WT_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R1.fq.gz, /mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R2.fq.gz]]
-[0e/6ea98a] Cached process > TRIM:trimmomatic (1)
-[f8/1523a4] Cached process > fastqc_raw:fastqc (2)
-[2f/46b73e] Cached process > fastqc_raw:fastqc (1)
-[a8/6e8bdb] Cached process > TRIM:trimmomatic (2)
-[05/f5d4a8] Cached process > fastqc_trim:fastqc (1)
-[90/8995a7] Cached process > fastqc_trim:fastqc (2)
-[f4/a86df5] Submitted process > MAP:star_alignment (1)
+/mnt/c/Users/tuurm/Documents/nextflow-course/data/index
+[mut_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R1.fq, /mnt/c/Users/tuurm/Documents/nextflow-course/data/mut_lib1_R2.fq]]
+[WT_lib1_R, [/mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R1.fq, /mnt/c/Users/tuurm/Documents/nextflow-course/data/WT_lib1_R2.fq]]
+[0c/23fa28] Submitted process > MAP:star_alignment (1)
+[68/237d80] Submitted process > IDX:star_idx
 Error executing process > 'MAP:star_alignment (1)'
 
 Caused by:
-  Process `MAP:star_alignment (1)` terminated with an error exit status (139)
+  Process `MAP:star_alignment (1)` terminated with an error exit status (102)
 
 Command executed:
 
   mkdir -p /mnt/c/Users/tuurm/Documents/nextflow-course/results/mapped-reads/
+  
   STAR --runMode alignReads \
-      --genomeDir index \  
-      --runThreadN 4 \
+      --genomeDir index/ \  
+      --readFilesIn mut_lib1_R1.fq mut_lib1_R2.fq \
+      --runThreadN 1 \
       --outFileNamePrefix mut_lib1_R \
       --outSAMtype BAM SortedByCoordinate \
-      --sjdbGTFfile Drosophila_melanogaster.BDGP6.85.sample.gtf \
-      --readFilesIn mut_lib1_R1_P.fq mut_lib1_R2_P.fq
+      --sjdbGTFfile Drosophila_melanogaster.BDGP6.85.sample.gtf
 
 Command exit status:
-  139
+  102
 
 Command output:
   (empty)
 
 Command error:
-  .command.sh: line 4:     8 Segmentation fault      STAR --runMode alignReads --genomeDir index \ 
+  
+  EXITING because of fatal input ERROR: could not open readFilesIn=Read1
+  
+  Nov 26 14:37:06 ...... FATAL ERROR, exiting
 
 Work dir:
-  /mnt/c/Users/tuurm/Documents/nextflow-course/work/f4/a86df550c4b5b0d369591704989c08
+  /mnt/c/Users/tuurm/Documents/nextflow-course/work/0c/23fa282956be412ef2e3a6435628cc
 
-Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
 
+WARN: Killing pending tasks (1)
