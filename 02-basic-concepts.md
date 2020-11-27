@@ -12,6 +12,7 @@ blastp -query sample.fasta -outfmt 6 \
 	| cut -f 2 \
 	| blastdbcmd -entry - > sequences.txt
 ```
+
 Starting with a shebang line, the `blastp` command is piped through multiple times to eventually result in an output file `sequences.txt`. The downside of this very basic and intuitive pipeline is that it has a sequential flow. In response to that, pipeline tools were built which are aimed to deal with more complex situations. Nextflow is designed around the idea that Linux has many simple but powerful command-line and scripting tools that, when chained together, facilitate complex data manipulations. 
 
 
