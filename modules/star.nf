@@ -7,21 +7,23 @@ params.outdir = "$launchDir/results"
 params.genomeDir = "$launchDir/data/index/"
 
 process star_idx {
-    publishDir "$params.genomeDir", mode: 'copy', overwrite: true
     label 'high'
     container "quay.io/biocontainers/star:2.6.1d--0"
 
     input:
     path genome
     path gtf
+    
+    output:
+    path "genome_dir"
 
     script:
     """
-    mkdir -p $params.genomeDir
-
+    mkdir genome_dir
+    
     STAR --runThreadN $task.cpus \\
       --runMode genomeGenerate \\
-      --genomeDir $params.genomeDir \\
+      --genomeDir genome_dir \\
       --genomeFastaFiles $genome \\
       --genomeSAindexNbases $params.genomeSAindexNbases \\
       --sjdbGTFfile $gtf
@@ -30,32 +32,21 @@ process star_idx {
 
 process star_alignment {
     publishDir "$params.outdir/mapped-reads", mode: 'copy', overwrite: true
-    label 'low'
+    label 'high'
     container "quay.io/biocontainers/star:2.6.1d--0"
 
     input:
     tuple val(sample), path(reads) 
-    path (index)
-    path (gtf)
-
-    //output:
-    //tuple val(sample), path("*Aligned.out.bam") , emit: bam
-    //tuple val(meta), path("*Log.final.out")   , emit: log_final
-    //tuple val(meta), path("*Log.out")         , emit: log_out
-    //tuple val(meta), path("*Log.progress.out"), emit: log_progress
-    //path  "*.version.txt"                     , emit: version
-
-    //tuple val(sample), path("*sortedByCoord.out.bam")  , emit: bam_sorted
-    //tuple val(meta), path("*toTranscriptome.out.bam"), optional:true, emit: bam_transcript
-    //tuple val(meta), path("*fastq.gz")               , optional:true, emit: fastq
-    //tuple val(meta), path("*.tab")                   , optional:true, emit: tab
+    path genomeDir
+    path genome
+    path gtf
 
     script:
     """
     mkdir -p $params.outdir/mapped-reads/
 
     STAR  \\
-        --genomeDir $index/ \\  
+        --genomeDir $genomeDir \\  
         --readFilesIn ${reads[0]} ${reads[1]} \\
         --runThreadN $task.cpus \\
         --outSAMtype BAM SortedByCoordinate \\
@@ -72,16 +63,20 @@ workflow IDX {
 
   main: 
   star_idx(genome, gtf)
+  
+  emit:
+  star_idx.out
 }
 
 workflow MAP {
   take:
   reads
-  index
+  genomeDir
+  genome
   gtf
 
   main: 
-  star_alignment(reads,index, gtf)
+  star_alignment(reads, genomeDir, genome, gtf)
 
   //emit:
   //bam_sorted_output = star_alignment.out.bam_sorted

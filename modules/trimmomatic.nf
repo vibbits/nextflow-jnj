@@ -16,8 +16,9 @@ process trimmomatic {
     tuple val(sample), path(reads) 
 
     output:
-    tuple val("${sample}"), path("${sample}{1,2}_P.fq"), emit: trim_fq
-
+    tuple val("${sample}"), path("${sample}*_P.fq"), emit: trim_fq
+    tuple val("${sample}"), path("${sample}*_U.fq"), emit: untrim_fq
+    
     script:
     """
     mkdir -p $params.outdir/trimmed-reads/
@@ -30,8 +31,8 @@ workflow TRIM {
     input
     
     main:
-		trim_fq = trimmomatic(input)
+		trimmomatic(input)
 
     emit:
-    trim_fq
+    trim_fq =  trimmomatic.out.trim_fq
 }
