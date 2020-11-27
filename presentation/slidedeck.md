@@ -1,19 +1,28 @@
 ---
 marp: true
 
-theme: default
+theme: white
 <!-- class: invert -->
+_class: invert
+---
+
+
+
+---
+
+![nextflow](../img/nextflow-logo.png)
+
 
 ---
 
 # Introduction
-This tutorial aims to get you familiarized with Nextflow. 
+- Understand workflow pipelines
+- Write simple pipelines yourself!
 
-After this course you should be able to understand workflow pipelines that are written in Nextflow and write simple pipelines yourself!
 
 ---
 
-## Overview:
+# Overview:
 - General introduction to Nextflow 
 - Basic concepts: processes, channels and operators
 - Creating our first Nextflow script(s)
@@ -22,17 +31,17 @@ After this course you should be able to understand workflow pipelines that are w
 
 ---
 
-## Prerequisites:
+# Prerequisites:
 - Feel confident interacting with the command-line
 
-## Installations:
+# Installations:
 - [Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation)
 - [Docker](https://docs.docker.com/engine/install/)
 - Optionally, [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
 
 ---
 
-## Further reading & references:
+# Further reading & references:
 
 - Nextflow's official documentation ([link](https://www.nextflow.io/docs/latest/index.html))
 - Reach out to the community on Gitter ([link](https://gitter.im/nextflow-io/nextflow))
