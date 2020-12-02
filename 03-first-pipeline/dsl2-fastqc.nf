@@ -24,7 +24,7 @@ process fastqc {
   publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
     
   input:
-  tuple val(sample), path(reads)
+  tuple val(sample), path(reads)  // from is omitted
 
   script:
   """

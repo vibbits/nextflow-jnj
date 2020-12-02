@@ -47,15 +47,23 @@ process quality-control {
 
 In the latter case, write the following line in the `nextflow.config` file:
 ```
-process.container = 'rnaseq:latest'
+process.container = 'vibbioinfocore/analysispipeline:latest'
 ```
-We're referring to a Docker container image that already exists locally on our computer, nl. `rnaseq:latest`. It was created by building it from the Dockerfile: `docker build -t rnaseq:latest .`. Notice however that all the tools and dependencies necessary during your pipeline, need to be present in this image. To run the pipeline script with this Docker container image, use the following command: `nextflow run example.nf -with-docker`. 
+We're referring to a Docker container image that exists on Dockerhub. Notice however that all the tools and dependencies necessary during your pipeline, need to be present in this image. To run the pipeline script with this Docker container image, use the following command: `nextflow run example.nf -with-docker`. 
 
 Ultimately, the parameter `-with-docker` does not need to be defined and it should use the Docker container in the background at all times, for this purpose also use the `docker.enabled = true` option in the config file. Another interesting parameter to consider addin to the configuration file is the `docker.runOptions = '-u \$(id -u):\$(id -g)'`. This allows us to create files with permissions on user-level instead of the default root-level files.  
 
-Similarly with a singularity image. The first time running with Singularity container can be done with `-with-singularity` parameter where the image is downloaded from Dockerhub as well, built on runtime and then stored in a folder `singularity/`. Re-using a singularity image is possible with:
+**Singularity**:
+
+Similarly with a singularity image for which you do not have to adapt the pipeline script. You can run with Singularity container using the following command-line parameter: `-with-singularity [singularity-image-file]`, where the image is downloaded from Dockerhub as well, built on runtime and then stored in a folder `singularity/`. Re-using a singularity image is possible with:
 ```
 singularity.cacheDir = "/path/to/singularity"
+```
+
+If you want to avoid entering the Singularity image as a command line parameter, you can define it in the Nextflow configuration file. For example you can add the following lines in the `nextflow.config` file:
+```
+process.container = 'singularity.img'
+singularity.enabled = true
 ```
 
 ## Executors
@@ -65,5 +73,5 @@ If not otherwise specified, processes are executed on the local computer. The lo
 
 Hence, you can write your pipeline script once and have it running on your computer, a cluster resource manager or the cloud by simply changing the executor definition in the Nextflow configuration file. As these configurations are often a one-time effort, managed by a local IT/admin person, we refer to the [official documentation](https://www.nextflow.io/docs/latest/executor.html). 
 
-![executors](img/executors-schedulers.png)
+![executors](../img/executors-schedulers.png)
 

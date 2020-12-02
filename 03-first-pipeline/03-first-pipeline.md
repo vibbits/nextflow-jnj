@@ -180,10 +180,8 @@ Now we're ready to use a process, defined in a module, multiple times in a workf
 
 Run `03-first-pipeline/dsl2-subworkflow.nf` which contains the `trimmomatic` process internally and imports the `fastqc` process from the modules library `module/fastqc.nf`. 
 
-- Hmm, error? `Workflow 'QC' declares 1 input channels but 2 were specified`. Notice that it won't work because twice same process, so do collect/mix. 
-
 ## RNAseq pipeline
-Similarly as described above, we can extent this pipeline and map our trimmed reads on a reference genome. First, we'll have to index our reads and afterwards we can map our reads. In the folder `modules/` find the script `star.nf` which contains two processes: `star_index` and `star_alignment`. 
+Similarly as described above, we can extend this pipeline and map our trimmed reads on a reference genome. First, we'll have to index our reads and afterwards we can map our reads. In the folder `modules/` find the script `star.nf` which contains two processes: `star_index` and `star_alignment`. 
 These modules are called from the main script `03-first-pipeline/dsl2-RNAseq.nf`. 
 
 This pipeline is still subject to optimizations which will be elaborated in the next section. 

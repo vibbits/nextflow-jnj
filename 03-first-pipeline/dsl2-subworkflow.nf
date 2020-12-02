@@ -14,9 +14,14 @@ params.avgqual = "AVGQUAL:30"
 println """\
       LIST OF PARAMETERS
 ================================
+            GENERAL
 Reads            : $params.reads
 Output-folder    : $params.outdir/
+
+          TRIMMOMATIC
 Threads          : $params.threads
+Sliding window   : $params.slidingwindow
+Avg quality      : $params.avgqual
 """
 
 // Also channels are being created. 
@@ -25,15 +30,15 @@ read_pairs_ch = Channel
 
 // Process trimmomatic
 process trimmomatic {
-    publishDir "$params.outdir/trimmed-reads", mode: 'copy'
+    publishDir "$params.outdir/trimmed-reads", mode: 'copy', overwrite: true
 
     // Same input as fastqc on raw reads, comes from the same channel. 
     input:
-    tuple val(sample), file(reads) 
+    tuple val(sample), path(reads) 
 
     output:
-    tuple val(sample), file("${sample}{1,2}P.fq"), emit: paired_fq
-    //tuple val(sample), file("${sample}_1U.fq"), file("${sample}_2U.fq"), emit: unpaired_fq
+    tuple val("${sample}"), path("${sample}*_P.fq"), emit: trim_fq
+    tuple val("${sample}"), path("${sample}*_U.fq"), emit: untrim_fq
 
     script:
     """
@@ -42,12 +47,12 @@ process trimmomatic {
     """
 }
 
-include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" //addParams(OUTPUT: fastqcOutputFolder)
+include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" 
 
 // Running a workflow with the defined processes here.  
 workflow {
   read_pairs_ch.view()
 	fastqc_raw(read_pairs_ch) 
-  paired_fq = trimmomatic(read_pairs_ch)
-  fastqc_trim(paired_fq)
+  trimmomatic(read_pairs_ch)
+  fastqc_trim(trimmomatic.out.trim_fq)
 }
