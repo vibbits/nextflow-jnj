@@ -4,7 +4,6 @@
 nextflow.enable.dsl=2
 
 params.outdir = "$launchDir/results"
-params.genomeDir = "$launchDir/data/index/"
 
 process star_idx {
     label 'high'
@@ -15,15 +14,15 @@ process star_idx {
     path gtf
     
     output:
-    path "genome_dir"
+    path "index_dir/", emit: index
 
     script:
     """
-    mkdir genome_dir
+    mkdir index_dir
     
     STAR --runThreadN $task.cpus \\
       --runMode genomeGenerate \\
-      --genomeDir genome_dir \\
+      --genomeDir index_dir/ \\
       --genomeFastaFiles $genome \\
       --genomeSAindexNbases $params.genomeSAindexNbases \\
       --sjdbGTFfile $gtf
@@ -31,26 +30,31 @@ process star_idx {
 }
 
 process star_alignment {
-    publishDir "$params.outdir/mapped-reads", mode: 'copy', overwrite: true
+    publishDir "$params.outdir/mapped-reads/", mode: 'copy', overwrite: true, pattern: "*.bam"  
     label 'high'
     container "quay.io/biocontainers/star:2.6.1d--0"
 
     input:
+    // (trim_fq, IDX.out, gtf)
     tuple val(sample), path(reads) 
-    path genomeDir
-    path genome
+    path indexDir
     path gtf
+
+    output:
+    tuple val(sample), path("*.bam") ,  emit: align_bam
 
     script:
     """
     mkdir -p $params.outdir/mapped-reads/
 
+
     STAR  \\
-        --genomeDir $genomeDir \\  
-        --readFilesIn ${reads[0]} ${reads[1]} \\
+        --readFilesIn ${reads} \\
         --runThreadN $task.cpus \\
         --outSAMtype BAM SortedByCoordinate \\
-        --sjdbGTFfile ${gtf} 
+        --sjdbGTFfile ${gtf} \\
+        --outFileNamePrefix $sample. \\
+        --genomeDir ${indexDir}
     """
 }
 
@@ -65,19 +69,18 @@ workflow IDX {
   star_idx(genome, gtf)
   
   emit:
-  star_idx.out
+  index = star_idx.out.index
 }
 
 workflow MAP {
   take:
   reads
-  genomeDir
-  genome
+  indexDir
   gtf
 
   main: 
-  star_alignment(reads, genomeDir, genome, gtf)
+  star_alignment(reads, indexDir, gtf)
 
-  //emit:
-  //bam_sorted_output = star_alignment.out.bam_sorted
+  emit:
+  align_bam = star_alignment.out.align_bam
 }

@@ -471,8 +471,6 @@ Inspect: `03-first-pipeline/dsl2-trimming.nf`
 nextflow run 03-first-pipeline/dsl2-trimming.nf
 ```
 
-
-
 ---
 
 ## Quality control on trimmed reads with `FastQC` (DSL2)
