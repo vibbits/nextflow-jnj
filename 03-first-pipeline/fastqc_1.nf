@@ -13,7 +13,7 @@ reads_ch = Channel
 process fastqc_raw_reads {
 
     input:
-    file read from reads_ch 
+    path read from reads_ch 
     
     script:
     """

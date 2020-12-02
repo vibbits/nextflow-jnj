@@ -14,9 +14,14 @@ params.avgqual = "AVGQUAL:30"
 println """\
       LIST OF PARAMETERS
 ================================
+            GENERAL
 Reads            : $params.reads
 Output-folder    : $params.outdir/
+
+          TRIMMOMATIC
 Threads          : $params.threads
+Sliding window   : $params.slidingwindow
+Avg quality      : $params.avgqual
 """
 
 // Also channels are being created. 
@@ -29,12 +34,12 @@ process fastqc {
   publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
     
   input:
-  tuple val(sample), file(reads)
+  tuple val(sample), path(reads)
 
   script:
   """
   mkdir -p $params.outdir/quality-control-$sample
-  fastqc --outdir $params.outdir/quality-control-$sample ${reads}
+  fastqc ${reads}
   """
 }
 
@@ -44,16 +49,16 @@ process trimmomatic {
 
     // Same input as fastqc on raw reads, comes from the same channel. 
     input:
-    tuple val(sample), file(reads) 
+    tuple val(sample), path(reads) 
 
     output:
-    tuple val(sample), file("${sample}_1P.fq"), file("${sample}_2P.fq"), emit: paired_fq
-    tuple val(sample), file("${sample}_1U.fq"), file("${sample}_2U.fq"), emit: unpaired_fq
+    tuple val("${sample}"), path("${sample}*_P.fq"), emit: paired_fq
+    tuple val("${sample}"), path("${sample}*_U.fq"), emit: unpaired_fq
 
     script:
     """
     mkdir -p $params.outdir/trimmed-reads/
-    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} ${sample}_1P.fq ${sample}_1U.fq ${sample}_2P.fq ${sample}_2U.fq $params.slidingwindow $params.avgqual 
+    trimmomatic PE -threads $params.threads ${reads[0]} ${reads[1]} ${sample}1_P.fq ${sample}1_U.fq ${sample}2_P.fq ${sample}2_U.fq $params.slidingwindow $params.avgqual 
     """
 }
 
@@ -62,5 +67,6 @@ workflow {
 	read_pairs_ch.view()
 	fastqc(read_pairs_ch) 
   paired_fq = trimmomatic(read_pairs_ch)
-  //fastqc(paired_fq) // This will raise an error. 
+  trimmomatic.out.paired_fq.view()
+  //fastqc(trimmomatic.out.paired_fq) // This will raise an error. Do you remember why?
 }

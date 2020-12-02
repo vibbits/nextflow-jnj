@@ -43,6 +43,6 @@ workflow {
 	fastqc_raw(read_pairs_ch) 
 	trim_fq = TRIM(read_pairs_ch)
 	fastqc_trim(trim_fq)
-	IDX(genome, gtf)
-  MAP(read_pairs_ch, IDX.out, genome, gtf)
+	//IDX(genome, gtf)
+  //MAP(read_pairs_ch, IDX.out, genome, gtf)
 }

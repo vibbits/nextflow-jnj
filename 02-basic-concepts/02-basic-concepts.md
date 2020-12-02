@@ -18,7 +18,7 @@ Starting with a shebang line, the `blastp` command is piped through multiple tim
 
 By definition, Nextflow is a reactive workflow framework and a programming Domain Specific Language that eases the writing of data-intensive computational pipelines[[1](https://www.nextflow.io/)]. Nextflow scripting is an extension of the Groovy programming language, which in turn is a super-set of the Java programming language. Groovy can be considered as Python for Java in a way that simplifies the writing of code and is more approachable. 
 
-![language subset](img/java-groovy-nextflow.png)
+![language subset](../img/java-groovy-nextflow.png)
 
 ## Why (not)?
 Nextflow is not the only player in the field[[2](https://github.com/pditommaso/awesome-pipeline/)], however there are good reasons to opt for it. 
@@ -53,7 +53,20 @@ The script `02-basic-concepts/firstscript.nf` is using these three components an
 
 Since the introduction of the new DSL2, *workflows* can be added to this list. This will be discussed in the next chapter. 
 
-![channels-processes](img/process-channel.png)
+![channels-processes](../img/process-channel.PNG)
+Reference: [https://seqera.io/training/](https://seqera.io/training/)
+
+[comment]: <> (The workflows can be repesented as graphs where the nodes are the processes and the edges are the channels. The processes are block of code that can be executed such as scripts or programs, while the channels are asynchronous queue able to connect processess among them via input / output.)
+
+[comment]: <> (!! My own graph)
+
+[comment]: <> (Each process is independent from the other and can be run in parallel depending on the availability of processors or if you are in a cluster environment with a scheduler supported by Nextflow. Note also the implicit parallelisation *.fastq in a channel one channel will split it out over multiple processes simultaneously. No need of making a fors–loop.)
+
+[comment]: <> (In the previous example the processes A, B and C can be run in parallel and only at their end the process D is triggered.)
+
+
+
+
 
 ### 1. Channels:  
 The input of the analysis is stored in a channel, these are generally files like sequencing, reference fasta, annotation files, etc. however the input can be of any kind like numbers, strings, lists, etc. To have a complete overview, we refer to the official documentation[[4](https://www.nextflow.io/docs/latest/channel.html#)]. Here are some examples of how a channel is being created:
@@ -103,7 +116,7 @@ c1 .mix(c2,c3)
 ```
 
 ### 3. Processes:
-are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. 
+Processes are the backbone of the pipeline. They represent each individual subpart of the analysis. In the code-snippet below, you can see that it consists of a couple of blocks: directives, input, output, when clause and the script. 
 
 ```
 process < name > {
@@ -129,14 +142,14 @@ Each process is executed independently and isolated from any other process. They
 
 
 ---
-### Running our first script:
+## Running our first pipeline:
 If we want to run a Nextflow script in its most basic form, we will use the following command:
 ```
 nextflow run example.nf
 ```
 In our case, we will replace `example.nf` with `02-basic-consepts/firstscript.nf`. First, inspect the script `02-basic-consepts/firstscript.nf` and notice how the channels are being created, passed on to the process' inputs, processed by the script section and then given to the output. 
 
-When we run this script, the result file will not be present in our folder structure. Question: look at the output... Can you guess where to find the result? 
+When we run this script, the result file will not be present in our folder structure. Where will the output of this script be stored?
 
 Nextflow will generate an output that has a standard lay-out:
 ```
@@ -167,13 +180,26 @@ Besides the output, also a bunch of hidden `.command.*` files are present:
 
 Earlier, we described that Nextflow uses an asynchronous FIFO principle. Let's exemplify this by running the script `02-basic-consepts/fifo.nf` and inspect the order that the channels are being processed. 
 
-Note also the implicit parallelisation *.fastq in a channel (one channel) will spit it out over multiple processes simultaneously. No need of making a fors–loop.
-
-![asynchr-fifo](img/asynchronous-FIFO.png)
+```
+N E X T F L O W  ~  version 20.07.1
+Launching `02-basic-concepts/fifo.nf` [nauseous_mahavira] - revision: a71d904cf6
+[-        ] process > whosfirst -
+This is job number 6
+This is job number 3
+This is job number 7
+This is job number 8
+This is job number 5
+This is job number 4
+This is job number 1
+This is job number 2
+This is job number 9
+executor >  local (10)
+[4b/aff57f] process > whosfirst (10) [100%] 10 of 10
+```
 
 ---
 
-A script, as part of the process, can be written in any language (bash, Python, Perl, Ruby, etc.). This allows to add self-written scripts in the pipeline. 
+A script, as part of the process, can be written in any language (bash, Python, Perl, Ruby, etc.). This allows to add self-written scripts in the pipeline. The script can be written in the process itself, or can be present as a script in another folder and is run from the process here. 
 
 ```
 #!/usr/bin/env nextflow

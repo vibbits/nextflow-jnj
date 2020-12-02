@@ -20,7 +20,7 @@ read_pairs_ch = Channel
 process fastqc_raw_reads {
 
     input:
-    tuple val(sample), file(reads) from read_pairs_ch
+    tuple val(sample), path(reads) from read_pairs_ch
 
     script:
     """

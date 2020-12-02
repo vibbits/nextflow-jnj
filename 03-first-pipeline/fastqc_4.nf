@@ -24,10 +24,7 @@ process fastqc_raw_reads {
     publishDir "$params.outdir/quality-control-$sample/", mode: 'copy', overwrite: true
     
     input:
-    tuple val(sample), file(reads) from read_pairs_ch
-
-    //output:
-    //file("fastqc_${sample}_logs")
+    tuple val(sample), path(reads) from read_pairs_ch
 
     script:
     """
