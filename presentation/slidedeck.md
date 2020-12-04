@@ -106,8 +106,8 @@ Some thoughts or disadvantages from my personal point of view, it takes some tim
 
 --- 
 
-![width:900 ](../img/process-channel.PNG)
-Reference: [https://seqera.io/training/](https://seqera.io/training/)
+![width:900 ](../img/nextflow-conceptually.png)
+
 
 <!--
 Nextflow consists of three main components: channels, operators and processes. 
