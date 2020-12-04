@@ -53,7 +53,7 @@ The script `02-basic-concepts/firstscript.nf` is using these three components an
 
 Since the introduction of the new DSL2, *workflows* can be added to this list. This will be discussed in the next chapter. 
 
-![channels-processes](../img/process-channel.PNG)
+![channels-processes](../img/process-channel.png)
 Reference: [https://seqera.io/training/](https://seqera.io/training/)
 
 [comment]: <> (The workflows can be repesented as graphs where the nodes are the processes and the edges are the channels. The processes are block of code that can be executed such as scripts or programs, while the channels are asynchronous queue able to connect processess among them via input / output.)
