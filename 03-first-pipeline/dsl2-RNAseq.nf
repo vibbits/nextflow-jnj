@@ -62,8 +62,8 @@ workflow {
 	
   // Mapping
   index_dir = IDX(genome, gtf)
-  mapping_out = MAP(trim_fq, index_dir, gtf)
+  MAP(trim_fq, index_dir, gtf)
   
   // Multi QC on all results
-  MULTIQC(fastqc_raw_out.mix(fastqc_trim_out, mapping_out.align_bam).collect())
+  MULTIQC(fastqc_raw_out.mix(fastqc_trim_out).collect())
 }
