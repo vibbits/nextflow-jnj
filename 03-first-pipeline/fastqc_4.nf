@@ -25,11 +25,14 @@ process fastqc_raw_reads {
     
     input:
     tuple val(sample), path(reads) from read_pairs_ch
+    
+    output:
+    path("*_fastqc.{zip,html}") 
 
     script:
     """
     mkdir -p $params.outdir/quality-control-$sample/
-    fastqc --outdir $params.outdir/quality-control-$sample/ ${reads}
+    fastqc ${reads}
     """
 }
 

@@ -49,12 +49,21 @@ gtf = file(params.gtf)
 include { QC as fastqc_raw; QC as fastqc_trim } from "${launchDir}/modules/fastqc" //addParams(OUTPUT: fastqcOutputFolder)
 include { IDX; MAP } from "${launchDir}/modules/star"
 include { TRIM } from "${launchDir}/modules/trimmomatic"
+include { MULTIQC } from "${launchDir}/modules/multiqc"
 
 // Running a workflow with the defined processes here.  
 workflow {
-	fastqc_raw(read_pairs_ch) 
-	trim_fq = TRIM(read_pairs_ch)
-	fastqc_trim(trim_fq)
-	index_dir = IDX(genome, gtf)
-  MAP(trim_fq, index_dir, gtf)
+	// QC on raw reads
+  fastqc_raw_out = fastqc_raw(read_pairs_ch) 
+	
+  // Trimming & QC
+  trim_fq = TRIM(read_pairs_ch)
+	fastqc_trim_out = fastqc_trim(trim_fq)
+	
+  // Mapping
+  index_dir = IDX(genome, gtf)
+  mapping_out = MAP(trim_fq, index_dir, gtf)
+  
+  // Multi QC on all results
+  MULTIQC(fastqc_raw_out.mix(fastqc_trim_out, mapping_out.align_bam).collect())
 }

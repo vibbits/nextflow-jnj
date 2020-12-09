@@ -18,6 +18,7 @@ process fastqc {
 
   script:
   """
+  mkdir -p $params.outdir/quality-control-$sample/
   fastqc ${reads}
   """
 }

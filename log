@@ -1,0 +1,59 @@
+N E X T F L O W  ~  version 20.07.1
+Launching `03-first-pipeline/dsl2-RNAseq.nf` [adoring_kalman] - revision: 2e881fb3e0
+      LIST OF PARAMETERS
+================================
+            GENERAL
+Reads            : /mnt/c/Users/tuurm/Documents/nextflow-course/data/*{1,2}.fq.gz
+Results-folder   : /mnt/c/Users/tuurm/Documents/nextflow-course/results/
+Threads          : 2
+================================
+          TRIMMOMATIC
+Sliding window   : SLIDINGWINDOW:4:15
+Average quality  : AVGQUAL:30
+================================
+             STAR
+Reference genome : /mnt/c/Users/tuurm/Documents/nextflow-course/data
+Genome directory : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.dna.fa 
+GTF-file         : /mnt/c/Users/tuurm/Documents/nextflow-course/data/Drosophila_melanogaster.BDGP6.85.sample.gtf
+Length-reads     : 98
+SAindexNbases    : 10
+================================
+
+[49/286c8c] Submitted process > IDX:star_idx
+[85/031f8c] Cached process > fastqc_raw:fastqc (2)
+[5b/eba179] Cached process > fastqc_raw:fastqc (1)
+[b8/8ee38c] Cached process > TRIM:trimmomatic (1)
+[e4/d35624] Cached process > TRIM:trimmomatic (2)
+Error executing process > 'IDX:star_idx'
+
+Caused by:
+  Process `IDX:star_idx` terminated with an error exit status (139)
+
+Command executed:
+
+  mkdir index_dir
+  
+  STAR --runThreadN 8 \
+    --runMode genomeGenerate \
+    --genomeDir index_dir/ \
+    --genomeFastaFiles Drosophila_melanogaster.BDGP6.dna.fa \
+    --genomeSAindexNbases 10 \
+    --sjdbGTFfile Drosophila_melanogaster.BDGP6.85.sample.gtf
+
+Command exit status:
+  139
+
+Command output:
+  (empty)
+
+Command error:
+  .command.sh: line 9:   306 Segmentation fault      STAR --runThreadN 8 --runMode genomeGenerate --genomeDir index_dir/ --genomeFastaFiles Drosophila_melanogaster.BDGP6.dna.fa --genomeSAindexNbases 10 --sjdbGTFfile Drosophila_melanogaster.BDGP6.85.sample.gtf
+
+Work dir:
+  /mnt/c/Users/tuurm/Documents/nextflow-course/work/49/286c8ce4602b5586a5b617806ff7b8
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+
+[08/1e0142] Cached process > fastqc_trim:fastqc (1)
+[7a/0fffd5] Cached process > fastqc_trim:fastqc (2)
+Waiting files transfer to complete (2 files)
