@@ -39,11 +39,17 @@ include { TRIM } from "${launchDir}/modules/trimmomatic"
 
 // Running a workflow with the defined processes here.  
 workflow {
-	read_pairs_ch.view()
-	fastqc_raw(read_pairs_ch) 
-	trim_fq = TRIM(read_pairs_ch)
-	fastqc_trim(trim_fq)
-  trim_fq.view()
-	index_dir = IDX(genome, gtf)
+	// QC on raw reads
+  fastqc_raw_out = fastqc_raw(read_pairs_ch) 
+	
+  // Trimming & QC
+  trim_fq = TRIM(read_pairs_ch)
+	fastqc_trim_out = fastqc_trim(trim_fq)
+	
+  // Mapping
+  index_dir = IDX(genome, gtf)
   MAP(trim_fq, index_dir, gtf)
+  
+  // Multi QC on all results
+  MULTIQC(fastqc_raw_out.mix(fastqc_trim_out).collect())
 }
